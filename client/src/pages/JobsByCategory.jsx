@@ -1,36 +1,42 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { JobCard } from "@/components/JobCard";
+import { JobCard } from "@/components/JobCard.jsx";
 import { EXPERIENCE_LEVELS, JOB_TYPES, SALARY_RANGES } from "@/lib/constants";
-import type { Job, JobCategory } from "@shared/schema";
 
-export default function Jobs() {
+export default function JobsByCategory() {
+  const { slug } = useParams();
+  
   const [filters, setFilters] = useState({
     search: "",
-    categoryId: "",
-    experienceLevel: "",
-    jobType: "",
-    salaryRange: "",
+    experienceLevel: "all",
+    jobType: "all",
+    salaryRange: "all",
   });
 
-  const { data: categories = [] } = useQuery<JobCategory[]>({
-    queryKey: ['/api/job-categories'],
+  const { data: category } = useQuery({
+    queryKey: ['/api/job-categories/slug', slug],
+    queryFn: async () => {
+      const response = await fetch(`/api/job-categories/slug/${slug}`);
+      if (!response.ok) throw new Error('Failed to fetch category');
+      return response.json();
+    },
   });
 
-  const { data: jobs = [], isLoading } = useQuery<Job[]>({
-    queryKey: ['/api/jobs', filters],
+  const { data: jobs = [], isLoading } = useQuery({
+    queryKey: ['/api/jobs', { categorySlug: slug, ...filters }],
     queryFn: async () => {
       const params = new URLSearchParams();
       
+      params.append('categorySlug', slug);
       if (filters.search) params.append('search', filters.search);
-      if (filters.categoryId) params.append('categoryId', filters.categoryId);
-      if (filters.experienceLevel) params.append('experienceLevel', filters.experienceLevel);
-      if (filters.jobType) params.append('jobType', filters.jobType);
+      if (filters.experienceLevel && filters.experienceLevel !== 'all') params.append('experienceLevel', filters.experienceLevel);
+      if (filters.jobType && filters.jobType !== 'all') params.append('jobType', filters.jobType);
       
-      if (filters.salaryRange) {
+      if (filters.salaryRange && filters.salaryRange !== 'all') {
         const [min, max] = filters.salaryRange.split('-');
         if (min) params.append('salaryMin', min);
         if (max && max !== 'undefined') params.append('salaryMax', max);
@@ -40,63 +46,62 @@ export default function Jobs() {
       if (!response.ok) throw new Error('Failed to fetch jobs');
       return response.json();
     },
+    enabled: !!slug,
   });
 
-  const handleFilterChange = (key: string, value: string) => {
+  const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
   const clearFilters = () => {
     setFilters({
       search: "",
-      categoryId: "",
-      experienceLevel: "",
-      jobType: "",
-      salaryRange: "",
+      experienceLevel: "all",
+      jobType: "all",
+      salaryRange: "all",
     });
   };
+
+  if (!category) {
+    return (
+      <div className="min-h-screen pt-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto text-center py-16">
+          <div className="animate-pulse">
+            <div className="h-12 bg-slate-300 dark:bg-slate-700 rounded w-1/2 mx-auto mb-4"></div>
+            <div className="h-6 bg-slate-300 dark:bg-slate-700 rounded w-1/3 mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
+          <div className={`w-20 h-20 bg-gradient-to-r ${category.color} rounded-2xl flex items-center justify-center mx-auto mb-6`}>
+            <i className={`${category.icon} text-white text-3xl`}></i>
+          </div>
           <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-            Find Your Perfect Remote Job
+            {category.name} Jobs
           </h1>
           <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Browse through thousands of remote tech opportunities from top companies worldwide
+            {category.description}
           </p>
         </div>
 
         {/* Search and Filters */}
         <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-700 mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
             {/* Search */}
-            <div className="lg:col-span-2">
+            <div>
               <Input
-                placeholder="Search jobs, companies, skills..."
+                placeholder="Search jobs, companies..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 className="w-full"
               />
-            </div>
-
-            {/* Category Filter */}
-            <div>
-              <Select value={filters.categoryId} onValueChange={(value) => handleFilterChange('categoryId', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id.toString()}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
             </div>
 
             {/* Experience Level Filter */}
@@ -106,7 +111,7 @@ export default function Jobs() {
                   <SelectValue placeholder="Experience" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Levels</SelectItem>
+                  <SelectItem value="all">All Levels</SelectItem>
                   {EXPERIENCE_LEVELS.map((level) => (
                     <SelectItem key={level.value} value={level.value}>
                       {level.label}
@@ -123,7 +128,7 @@ export default function Jobs() {
                   <SelectValue placeholder="Job Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   {JOB_TYPES.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label}
@@ -140,7 +145,7 @@ export default function Jobs() {
                   <SelectValue placeholder="Salary" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Salaries</SelectItem>
+                  <SelectItem value="all">All Salaries</SelectItem>
                   {SALARY_RANGES.map((range) => (
                     <SelectItem key={range.value} value={range.value}>
                       {range.label}
@@ -152,7 +157,10 @@ export default function Jobs() {
           </div>
 
           {/* Clear Filters */}
-          {Object.values(filters).some(Boolean) && (
+          {(filters.search || 
+            filters.experienceLevel !== 'all' || 
+            filters.jobType !== 'all' || 
+            filters.salaryRange !== 'all') && (
             <div className="mt-4 flex justify-end">
               <Button variant="outline" onClick={clearFilters}>
                 Clear Filters
@@ -165,10 +173,10 @@ export default function Jobs() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-              {isLoading ? "Loading jobs..." : `${jobs.length} Jobs Found`}
+              {isLoading ? "Loading jobs..." : `${jobs.length} ${category.name} Jobs Found`}
             </h2>
             <p className="text-slate-600 dark:text-slate-400">
-              Showing the latest remote opportunities
+              Remote opportunities in {category.name}
             </p>
           </div>
           
@@ -213,14 +221,14 @@ export default function Jobs() {
           </div>
         ) : jobs.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
-              <i className="fas fa-search text-3xl text-slate-400"></i>
+            <div className={`w-24 h-24 bg-gradient-to-r ${category.color} rounded-full flex items-center justify-center mx-auto mb-6 opacity-50`}>
+              <i className={`${category.icon} text-3xl text-white`}></i>
             </div>
             <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
-              No jobs found
+              No {category.name} jobs found
             </h3>
             <p className="text-slate-600 dark:text-slate-400 mb-6">
-              Try adjusting your filters or search terms to find more opportunities.
+              Try adjusting your filters or check back later for new opportunities.
             </p>
             <Button onClick={clearFilters}>
               Clear All Filters
@@ -238,7 +246,7 @@ export default function Jobs() {
         {jobs.length > 0 && jobs.length % 10 === 0 && (
           <div className="text-center mt-12">
             <Button className="px-8 py-3">
-              Load More Jobs
+              Load More {category.name} Jobs
             </Button>
           </div>
         )}

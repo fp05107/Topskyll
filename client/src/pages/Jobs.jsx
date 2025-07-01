@@ -9,10 +9,10 @@ import { EXPERIENCE_LEVELS, JOB_TYPES, SALARY_RANGES } from "@/lib/constants";
 export default function Jobs() {
   const [filters, setFilters] = useState({
     search: "",
-    categoryId: "",
-    experienceLevel: "",
-    jobType: "",
-    salaryRange: "",
+    categoryId: "all",
+    experienceLevel: "all",
+    jobType: "all",
+    salaryRange: "all",
   });
 
   const { data: categories = [] } = useQuery({
@@ -25,11 +25,11 @@ export default function Jobs() {
       const params = new URLSearchParams();
       
       if (filters.search) params.append('search', filters.search);
-      if (filters.categoryId) params.append('categoryId', filters.categoryId);
-      if (filters.experienceLevel) params.append('experienceLevel', filters.experienceLevel);
-      if (filters.jobType) params.append('jobType', filters.jobType);
+      if (filters.categoryId && filters.categoryId !== 'all') params.append('categoryId', filters.categoryId);
+      if (filters.experienceLevel && filters.experienceLevel !== 'all') params.append('experienceLevel', filters.experienceLevel);
+      if (filters.jobType && filters.jobType !== 'all') params.append('jobType', filters.jobType);
       
-      if (filters.salaryRange) {
+      if (filters.salaryRange && filters.salaryRange !== 'all') {
         const [min, max] = filters.salaryRange.split('-');
         if (min) params.append('salaryMin', min);
         if (max && max !== 'undefined') params.append('salaryMax', max);
@@ -48,10 +48,10 @@ export default function Jobs() {
   const clearFilters = () => {
     setFilters({
       search: "",
-      categoryId: "",
-      experienceLevel: "",
-      jobType: "",
-      salaryRange: "",
+      categoryId: "all",
+      experienceLevel: "all",
+      jobType: "all",
+      salaryRange: "all",
     });
   };
 
@@ -88,7 +88,7 @@ export default function Jobs() {
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id.toString()}>
                       {category.name}
@@ -105,7 +105,7 @@ export default function Jobs() {
                   <SelectValue placeholder="Experience" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Levels</SelectItem>
+                  <SelectItem value="all">All Levels</SelectItem>
                   {EXPERIENCE_LEVELS.map((level) => (
                     <SelectItem key={level.value} value={level.value}>
                       {level.label}
@@ -122,7 +122,7 @@ export default function Jobs() {
                   <SelectValue placeholder="Job Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   {JOB_TYPES.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label}
@@ -139,7 +139,7 @@ export default function Jobs() {
                   <SelectValue placeholder="Salary" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Salaries</SelectItem>
+                  <SelectItem value="all">All Salaries</SelectItem>
                   {SALARY_RANGES.map((range) => (
                     <SelectItem key={range.value} value={range.value}>
                       {range.label}
@@ -151,7 +151,11 @@ export default function Jobs() {
           </div>
 
           {/* Clear Filters */}
-          {Object.values(filters).some(Boolean) && (
+          {(filters.search || 
+            filters.categoryId !== 'all' || 
+            filters.experienceLevel !== 'all' || 
+            filters.jobType !== 'all' || 
+            filters.salaryRange !== 'all') && (
             <div className="mt-4 flex justify-end">
               <Button variant="outline" onClick={clearFilters}>
                 Clear Filters
