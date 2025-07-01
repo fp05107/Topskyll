@@ -26,6 +26,147 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Enhanced jobs API with multi-currency support
+  app.get("/api/jobs", async (req, res) => {
+    try {
+      const {
+        search,
+        categoryId,
+        categorySlug,
+        experienceLevel,
+        jobType,
+        salaryMin,
+        salaryMax,
+        currency = 'USD'
+      } = req.query;
+
+      // Build filter object
+      const filters: any = {};
+      
+      if (search) filters.search = search as string;
+      if (categoryId) filters.categoryId = parseInt(categoryId as string);
+      if (experienceLevel) filters.experienceLevel = experienceLevel as string;
+      if (jobType) filters.jobType = jobType as string;
+      
+      // Handle salary range filtering
+      if (salaryMin || salaryMax) {
+        filters.salaryMin = salaryMin ? parseInt(salaryMin as string) : undefined;
+        filters.salaryMax = salaryMax ? parseInt(salaryMax as string) : undefined;
+      }
+
+      // Get jobs from storage
+      let jobs = await storage.getAllJobs(filters);
+
+      // Handle category slug filtering
+      if (categorySlug) {
+        const category = await storage.getJobCategoryBySlug(categorySlug as string);
+        if (category) {
+          jobs = await storage.getJobsByCategory(category.id);
+          // Apply other filters if present
+          if (filters.search || filters.experienceLevel || filters.jobType) {
+            jobs = await storage.getAllJobs({...filters, categoryId: category.id});
+          }
+        }
+      }
+
+      // Add currency information to jobs
+      const jobsWithCurrency = jobs.map(job => ({
+        ...job,
+        salaryCurrency: currency,
+        formattedSalary: formatSalary(job.salaryMin ?? undefined, job.salaryMax ?? undefined, currency as string)
+      }));
+
+      res.json(jobsWithCurrency);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      res.status(500).json({ error: 'Failed to fetch jobs' });
+    }
+  });
+
+  // Helper function for salary formatting
+  function formatSalary(min?: number, max?: number, currency: string = 'USD'): string {
+    if (!min && !max) return "Salary not disclosed";
+    
+    const formatAmount = (amount: number) => {
+      if (currency === 'INR') {
+        if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
+        if (amount >= 100000) return `₹${(amount / 100000).toFixed(0)}L`;
+        return `₹${amount.toLocaleString()}`;
+      } else if (currency === 'USD') {
+        if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
+        if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}K`;
+        return `$${amount.toLocaleString()}`;
+      } else {
+        return `${amount.toLocaleString()}`;
+      }
+    };
+
+    if (min && max) {
+      return `${formatAmount(min)}-${formatAmount(max)} / year`;
+    }
+    const amount = min || max;
+    return amount ? `${formatAmount(amount)} / year` : "Salary not disclosed";
+  }
+
+  // Currency support API
+  app.get("/api/currencies", async (req, res) => {
+    try {
+      const currencies = {
+        USD: { symbol: "$", name: "US Dollar" },
+        EUR: { symbol: "€", name: "Euro" },
+        GBP: { symbol: "£", name: "British Pound" },
+        INR: { symbol: "₹", name: "Indian Rupee" },
+        CAD: { symbol: "C$", name: "Canadian Dollar" },
+        AUD: { symbol: "A$", name: "Australian Dollar" },
+        SGD: { symbol: "S$", name: "Singapore Dollar" },
+      };
+      res.json(currencies);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch currencies' });
+    }
+  });
+
+  // Salary ranges by currency
+  app.get("/api/salary-ranges", async (req, res) => {
+    try {
+      const { currency = 'USD' } = req.query;
+      
+      let ranges = [];
+      if (currency === 'INR') {
+        ranges = [
+          { label: "₹3-5 LPA", value: "300000-500000" },
+          { label: "₹5-8 LPA", value: "500000-800000" },
+          { label: "₹8-12 LPA", value: "800000-1200000" },
+          { label: "₹12-18 LPA", value: "1200000-1800000" },
+          { label: "₹18-25 LPA", value: "1800000-2500000" },
+          { label: "₹25+ LPA", value: "2500000-" },
+        ];
+      } else if (currency === 'USD') {
+        ranges = [
+          { label: "$30K-50K", value: "30000-50000" },
+          { label: "$50K-75K", value: "50000-75000" },
+          { label: "$75K-100K", value: "75000-100000" },
+          { label: "$100K-150K", value: "100000-150000" },
+          { label: "$150K-200K", value: "150000-200000" },
+          { label: "$200K+", value: "200000-" },
+        ];
+      } else {
+        ranges = [
+          { label: "25K-40K", value: "25000-40000" },
+          { label: "40K-60K", value: "40000-60000" },
+          { label: "60K-80K", value: "60000-80000" },
+          { label: "80K-120K", value: "80000-120000" },
+          { label: "120K+", value: "120000-" },
+        ];
+      }
+      
+      res.json(ranges);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to fetch salary ranges' });
+    }
+  });
+
   // Auth routes
   app.post("/api/auth/signup", async (req, res) => {
     try {

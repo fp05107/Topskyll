@@ -6,13 +6,29 @@ import { Button } from "@/components/ui/button";
 export function JobCard({ job, onApply }) {
   const [isSaved, setIsSaved] = useState(false);
 
-  const formatSalary = (min, max) => {
+  const formatSalary = (min, max, currency = 'USD') => {
     if (!min && !max) return "Salary not disclosed";
     
     const formatAmount = (amount) => {
-      if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
-      if (amount >= 100000) return `₹${(amount / 100000).toFixed(0)}L`;
-      return `₹${amount.toLocaleString()}`;
+      if (currency === 'INR') {
+        if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
+        if (amount >= 100000) return `₹${(amount / 100000).toFixed(0)}L`;
+        return `₹${amount.toLocaleString()}`;
+      } else if (currency === 'USD') {
+        if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
+        if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}K`;
+        return `$${amount.toLocaleString()}`;
+      } else if (currency === 'EUR') {
+        if (amount >= 1000000) return `€${(amount / 1000000).toFixed(1)}M`;
+        if (amount >= 1000) return `€${(amount / 1000).toFixed(0)}K`;
+        return `€${amount.toLocaleString()}`;
+      } else if (currency === 'GBP') {
+        if (amount >= 1000000) return `£${(amount / 1000000).toFixed(1)}M`;
+        if (amount >= 1000) return `£${(amount / 1000).toFixed(0)}K`;
+        return `£${amount.toLocaleString()}`;
+      } else {
+        return `${amount.toLocaleString()}`;
+      }
     };
 
     if (min && max) {
@@ -101,8 +117,13 @@ export function JobCard({ job, onApply }) {
         <div className="flex items-center justify-between">
           <div>
             <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              {formatSalary(job.salaryMin, job.salaryMax)}
+              {job.formattedSalary || formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency)}
             </span>
+            {job.salaryCurrency && job.salaryCurrency !== 'USD' && (
+              <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                in {job.salaryCurrency}
+              </div>
+            )}
           </div>
           <Button 
             onClick={() => onApply?.(job)}

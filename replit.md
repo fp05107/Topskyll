@@ -106,11 +106,81 @@ The application uses a PostgreSQL database with the following main entities:
 - `NODE_ENV` for environment-specific behavior
 - Development mode includes Replit-specific tooling
 
-## Changelog
+## Recent Changes
 ```
-Changelog:
-- July 01, 2025. Initial setup
+- July 01, 2025: Enhanced Jobs page with category tabs and multi-currency support
+  • Added popular category tabs (Frontend, Backend, Full Stack, AI/ML, Cloud, Mobile)
+  • Implemented enhanced search with filters and active filter display
+  • Restructured backend with proper folder organization (controllers, models, routes)
+  • Added multi-currency salary support (USD, EUR, GBP, INR, CAD, AUD, SGD)
+  • Enhanced job cards with better salary formatting and currency display
+  • Fixed Select component errors and improved navigation
+  • Converted all frontend components from TypeScript to JavaScript
+  • Created proper backend API structure for scalable currency handling
+- July 01, 2025: Initial setup with basic job portal functionality
 ```
+
+## Backend Architecture Updates
+
+### New Backend Structure
+```
+server/
+├── config/
+│   └── database.ts          # Database connection and currency configuration
+├── controllers/
+│   └── jobController.ts     # Job-related business logic with currency support
+├── models/
+│   └── Job.ts              # Job model with multi-currency utilities
+├── routes/
+│   └── jobRoutes.ts        # Structured job API routes
+├── middleware/             # Future middleware implementations
+├── storage.ts              # In-memory storage implementation
+├── routes.ts               # Main route configuration
+├── index.ts                # Application entry point
+└── vite.ts                 # Development server configuration
+```
+
+### Multi-Currency Features
+- **Supported Currencies**: USD, EUR, GBP, INR, CAD, AUD, SGD
+- **Currency Conversion**: Automatic conversion between currencies using exchange rates
+- **Localized Formatting**: Currency-specific formatting (e.g., INR in Lakhs/Crores)
+- **API Endpoints**: `/api/currencies`, `/api/salary-ranges` for dynamic currency support
+- **Job Filtering**: Salary range filtering with currency conversion support
+
+### Enhanced Jobs Page Features
+- **Category Tabs**: Quick access to popular job categories
+- **Advanced Search**: Enhanced search bar with real-time filtering
+- **Active Filters**: Visual display of applied filters with easy removal
+- **Responsive Design**: Improved mobile and desktop layouts
+- **Real-time Stats**: Dynamic job count and status indicators
+
+## Frontend Architecture Updates
+
+### JavaScript Migration
+- Successfully converted all components from TypeScript to JavaScript
+- Maintained type safety through careful prop handling and validation
+- Removed shared schema dependencies while preserving functionality
+- Enhanced component reusability and simplified import structure
+
+### Enhanced UI Components
+- **Tabs Component**: Added for category navigation
+- **Enhanced JobCard**: Multi-currency support and better visual hierarchy
+- **Improved Filters**: Better UX with labels and grouped controls
+- **Badge System**: Active filter visualization and status indicators
+
+## API Enhancements
+
+### New Endpoints
+- `GET /api/jobs?currency=USD` - Jobs with currency conversion
+- `GET /api/currencies` - Supported currencies list
+- `GET /api/salary-ranges?currency=INR` - Currency-specific salary ranges
+- `GET /api/jobs/stats?currency=USD` - Job statistics with currency support
+
+### Enhanced Filtering
+- Category filtering by slug or ID
+- Experience level and job type filtering
+- Salary range filtering with currency conversion
+- Full-text search across job titles, companies, and skills
 
 ## User Preferences
 ```
