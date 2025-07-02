@@ -14,6 +14,13 @@ import type {
   Review, 
   InsertReview 
 } from "../shared/schema";
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export class MemStorage implements IStorage {
   private talents: Map<number, Talent>;
@@ -52,22 +59,15 @@ export class MemStorage implements IStorage {
   private seedData() {
     // Load data from JSON files
     try {
-      import('fs').then(({ readFileSync }) => {
-        import('path').then(({ join }) => {
-          this.loadDataFromFiles(readFileSync, join);
-        });
-      });
+      this.loadDataFromFiles();
     } catch (error) {
       console.error('Failed to load data from JSON files:', error);
       this.seedBasicData();
     }
   }
 
-  private loadDataFromFiles(readFileSync: any, join: any) {
+  private loadDataFromFiles() {
     try {
-      // Add proper imports for path and fs
-      const path = require('path');
-      const fs = require('fs');
       
       // Load categories
       const categoriesPath = path.join(__dirname, 'data', 'categories.json');
