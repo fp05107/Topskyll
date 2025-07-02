@@ -3,6 +3,13 @@ import { Server } from "http";
 import { createServer } from "http";
 import { storage } from "./storage";
 import { TALENT_DATA, CATEGORY_DATA } from "./storage-simple";
+
+// Load job-related JSON data
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+const JOB_CATEGORY_DATA = JSON.parse(readFileSync(join(process.cwd(), 'server/data/job-categories.json'), 'utf-8'));
+const JOBS_DATA = JSON.parse(readFileSync(join(process.cwd(), 'server/data/jobs.json'), 'utf-8'));
 import { insertTalentSchema, insertCompanySchema, insertJobSchema, insertProposalSchema } from "../shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -114,33 +121,137 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Jobs
+  // Job Categories - Hierarchical system
+  app.get("/api/job-categories", async (req: Request, res: Response) => {
+    try {
+      res.json(JOB_CATEGORY_DATA);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch job categories" });
+    }
+  });
+
+  app.get("/api/job-categories/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const category = JOB_CATEGORY_DATA.find(cat => cat.id === id);
+      if (!category) {
+        return res.status(404).json({ error: "Category not found" });
+      }
+      res.json(category);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch category" });
+    }
+  });
+
+  app.get("/api/job-categories/:categoryId/subcategories", async (req: Request, res: Response) => {
+    try {
+      const categoryId = parseInt(req.params.categoryId);
+      const category = JOB_CATEGORY_DATA.find(cat => cat.id === categoryId);
+      if (!category) {
+        return res.status(404).json({ error: "Category not found" });
+      }
+      res.json(category.subcategories || []);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch subcategories" });
+    }
+  });
+
+  app.get("/api/job-categories/:categoryId/subcategories/:subcategoryId/specializations", async (req: Request, res: Response) => {
+    try {
+      const categoryId = parseInt(req.params.categoryId);
+      const subcategoryId = parseInt(req.params.subcategoryId);
+      
+      const category = JOB_CATEGORY_DATA.find(cat => cat.id === categoryId);
+      if (!category) {
+        return res.status(404).json({ error: "Category not found" });
+      }
+      
+      const subcategory = category.subcategories?.find(sub => sub.id === subcategoryId);
+      if (!subcategory) {
+        return res.status(404).json({ error: "Subcategory not found" });
+      }
+      
+      res.json(subcategory.specializations || []);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch specializations" });
+    }
+  });
+
+  // Jobs with hierarchical filtering
   app.get("/api/jobs", async (req: Request, res: Response) => {
     try {
-      const filters = {
-        companyId: req.query.companyId ? parseInt(req.query.companyId as string) : undefined,
-        categoryId: req.query.categoryId ? parseInt(req.query.categoryId as string) : undefined,
-        experienceLevel: req.query.experienceLevel as string,
-        jobType: req.query.jobType as string,
-        budgetMin: req.query.budgetMin ? parseInt(req.query.budgetMin as string) : undefined,
-        budgetMax: req.query.budgetMax ? parseInt(req.query.budgetMax as string) : undefined,
-        isRemote: req.query.isRemote ? req.query.isRemote === 'true' : undefined,
-        search: req.query.search as string,
-      };
-
-      const jobs = await storage.getAllJobs(filters);
+      let jobs = [...JOBS_DATA];
       
-      // Enrich jobs with company and category data
-      const enrichedJobs = await Promise.all(jobs.map(async (job) => {
-        const company = await storage.getCompany(job.companyId);
-        const category = await storage.getTalentCategory(job.categoryId);
+      // Apply hierarchical filters
+      if (req.query.categoryId) {
+        const categoryId = parseInt(req.query.categoryId as string);
+        jobs = jobs.filter(job => job.categoryId === categoryId);
+      }
+      
+      if (req.query.subcategoryId) {
+        const subcategoryId = parseInt(req.query.subcategoryId as string);
+        jobs = jobs.filter(job => job.subcategoryId === subcategoryId);
+      }
+      
+      if (req.query.specializationId) {
+        const specializationId = parseInt(req.query.specializationId as string);
+        jobs = jobs.filter(job => job.specializationId === specializationId);
+      }
+      
+      // Apply other filters
+      if (req.query.experienceLevel) {
+        const experienceLevel = req.query.experienceLevel as string;
+        jobs = jobs.filter(job => job.experienceLevel === experienceLevel);
+      }
+      
+      if (req.query.jobType) {
+        const jobType = req.query.jobType as string;
+        jobs = jobs.filter(job => job.jobType === jobType);
+      }
+      
+      if (req.query.isRemote) {
+        const isRemote = req.query.isRemote === 'true';
+        jobs = jobs.filter(job => job.isRemote === isRemote);
+      }
+      
+      if (req.query.search) {
+        const search = (req.query.search as string).toLowerCase();
+        jobs = jobs.filter(job => 
+          job.title.toLowerCase().includes(search) ||
+          job.company.toLowerCase().includes(search) ||
+          job.description.toLowerCase().includes(search) ||
+          job.skills.some(skill => skill.toLowerCase().includes(search))
+        );
+      }
+      
+      // Salary filtering
+      if (req.query.salaryMin) {
+        const salaryMin = parseInt(req.query.salaryMin as string);
+        jobs = jobs.filter(job => job.salaryMin && job.salaryMin >= salaryMin);
+      }
+      
+      if (req.query.salaryMax) {
+        const salaryMax = parseInt(req.query.salaryMax as string);
+        jobs = jobs.filter(job => job.salaryMax && job.salaryMax <= salaryMax);
+      }
+      
+      // Add category hierarchy information to each job
+      const enrichedJobs = jobs.map(job => {
+        const category = JOB_CATEGORY_DATA.find(cat => cat.id === job.categoryId);
+        const subcategory = category?.subcategories?.find(sub => sub.id === job.subcategoryId);
+        const specialization = subcategory?.specializations?.find(spec => spec.id === job.specializationId);
+        
         return {
           ...job,
-          company,
-          category
+          categoryName: category?.name,
+          subcategoryName: subcategory?.name,
+          specializationName: specialization?.name,
+          categorySlug: category?.slug,
+          subcategorySlug: subcategory?.slug,
+          specializationSlug: specialization?.slug
         };
-      }));
-
+      });
+      
       res.json(enrichedJobs);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch jobs" });

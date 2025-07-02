@@ -6,6 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Home from "@/pages/Home";
 import Jobs from "@/pages/Jobs";
+import JobsByCategory from "@/pages/JobsByCategory";
 import About from "@/pages/About";
 import TalentCategory from "@/pages/TalentCategory";
 
@@ -28,6 +29,7 @@ function App() {
             <Switch>
               <Route path="/" component={Home} />
               <Route path="/jobs" component={Jobs} />
+              <Route path="/jobs-by-category" component={JobsByCategory} />
               <Route path="/about" component={About} />
               <Route path="/talents/:category" component={TalentCategory} />
               <Route path="/how-it-works">

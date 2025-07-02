@@ -1,0 +1,504 @@
+[
+  {
+    "id": 1,
+    "name": "Software Development",
+    "slug": "software-development",
+    "description": "Build applications, websites, and software solutions",
+    "icon": "fas fa-code",
+    "color": "#3B82F6",
+    "subcategories": [
+      {
+        "id": 11,
+        "name": "Frontend Development",
+        "slug": "frontend-development",
+        "description": "User interface and user experience development",
+        "specializations": [
+          {
+            "id": 111,
+            "name": "React Developer",
+            "slug": "react-developer",
+            "skills": ["React", "JavaScript", "TypeScript", "Redux", "Next.js"]
+          },
+          {
+            "id": 112,
+            "name": "Angular Developer",
+            "slug": "angular-developer",
+            "skills": ["Angular", "TypeScript", "RxJS", "NgRx", "Ionic"]
+          },
+          {
+            "id": 113,
+            "name": "Vue.js Developer",
+            "slug": "vue-developer",
+            "skills": ["Vue.js", "Vuex", "Nuxt.js", "JavaScript", "TypeScript"]
+          },
+          {
+            "id": 114,
+            "name": "UI/UX Developer",
+            "slug": "ui-ux-developer",
+            "skills": ["HTML", "CSS", "JavaScript", "Figma", "Adobe XD"]
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "name": "Backend Development",
+        "slug": "backend-development",
+        "description": "Server-side logic and database management",
+        "specializations": [
+          {
+            "id": 121,
+            "name": "Node.js Developer",
+            "slug": "nodejs-developer",
+            "skills": ["Node.js", "Express.js", "JavaScript", "TypeScript", "MongoDB"]
+          },
+          {
+            "id": 122,
+            "name": "Python Developer",
+            "slug": "python-developer",
+            "skills": ["Python", "Django", "Flask", "FastAPI", "PostgreSQL"]
+          },
+          {
+            "id": 123,
+            "name": "Java Developer",
+            "slug": "java-developer",
+            "skills": ["Java", "Spring Boot", "Hibernate", "Maven", "MySQL"]
+          },
+          {
+            "id": 124,
+            "name": "PHP Developer",
+            "slug": "php-developer",
+            "skills": ["PHP", "Laravel", "Symfony", "CodeIgniter", "MySQL"]
+          },
+          {
+            "id": 125,
+            "name": ".NET Developer",
+            "slug": "dotnet-developer",
+            "skills": ["C#", ".NET Core", "ASP.NET", "Entity Framework", "SQL Server"]
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "name": "Mobile Development",
+        "slug": "mobile-development",
+        "description": "Native and cross-platform mobile applications",
+        "specializations": [
+          {
+            "id": 131,
+            "name": "Android Developer",
+            "slug": "android-developer",
+            "skills": ["Java", "Kotlin", "Android SDK", "Firebase", "Room"]
+          },
+          {
+            "id": 132,
+            "name": "iOS Developer",
+            "slug": "ios-developer",
+            "skills": ["Swift", "Objective-C", "Xcode", "Core Data", "SwiftUI"]
+          },
+          {
+            "id": 133,
+            "name": "React Native Developer",
+            "slug": "react-native-developer",
+            "skills": ["React Native", "JavaScript", "TypeScript", "Redux", "Expo"]
+          },
+          {
+            "id": 134,
+            "name": "Flutter Developer",
+            "slug": "flutter-developer",
+            "skills": ["Flutter", "Dart", "Firebase", "Provider", "Bloc"]
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "name": "Full Stack Development",
+        "slug": "fullstack-development",
+        "description": "End-to-end application development",
+        "specializations": [
+          {
+            "id": 141,
+            "name": "MERN Stack Developer",
+            "slug": "mern-stack-developer",
+            "skills": ["MongoDB", "Express.js", "React", "Node.js", "JavaScript"]
+          },
+          {
+            "id": 142,
+            "name": "MEAN Stack Developer",
+            "slug": "mean-stack-developer",
+            "skills": ["MongoDB", "Express.js", "Angular", "Node.js", "TypeScript"]
+          },
+          {
+            "id": 143,
+            "name": "Django Full Stack Developer",
+            "slug": "django-fullstack-developer",
+            "skills": ["Python", "Django", "PostgreSQL", "JavaScript", "HTML/CSS"]
+          },
+          {
+            "id": 144,
+            "name": "Laravel Full Stack Developer",
+            "slug": "laravel-fullstack-developer",
+            "skills": ["PHP", "Laravel", "MySQL", "Vue.js", "JavaScript"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Data Science & Analytics",
+    "slug": "data-science-analytics",
+    "description": "Extract insights from data and build predictive models",
+    "icon": "fas fa-chart-line",
+    "color": "#10B981",
+    "subcategories": [
+      {
+        "id": 21,
+        "name": "Data Science",
+        "slug": "data-science",
+        "description": "Machine learning and statistical analysis",
+        "specializations": [
+          {
+            "id": 211,
+            "name": "Machine Learning Engineer",
+            "slug": "machine-learning-engineer",
+            "skills": ["Python", "TensorFlow", "PyTorch", "Scikit-learn", "Pandas"]
+          },
+          {
+            "id": 212,
+            "name": "Data Scientist",
+            "slug": "data-scientist",
+            "skills": ["Python", "R", "SQL", "Statistics", "Jupyter"]
+          },
+          {
+            "id": 213,
+            "name": "AI/ML Researcher",
+            "slug": "ai-ml-researcher",
+            "skills": ["Python", "Deep Learning", "Computer Vision", "NLP", "Research"]
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "name": "Data Engineering",
+        "slug": "data-engineering",
+        "description": "Data pipeline and infrastructure development",
+        "specializations": [
+          {
+            "id": 221,
+            "name": "Big Data Engineer",
+            "slug": "big-data-engineer",
+            "skills": ["Apache Spark", "Hadoop", "Kafka", "Scala", "Python"]
+          },
+          {
+            "id": 222,
+            "name": "ETL Developer",
+            "slug": "etl-developer",
+            "skills": ["SQL", "Python", "Apache Airflow", "Talend", "Informatica"]
+          },
+          {
+            "id": 223,
+            "name": "Data Pipeline Engineer",
+            "slug": "data-pipeline-engineer",
+            "skills": ["Python", "Apache Kafka", "Docker", "Kubernetes", "AWS"]
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "name": "Business Intelligence",
+        "slug": "business-intelligence",
+        "description": "Business analytics and reporting solutions",
+        "specializations": [
+          {
+            "id": 231,
+            "name": "BI Developer",
+            "slug": "bi-developer",
+            "skills": ["SQL", "Power BI", "Tableau", "QlikView", "SSRS"]
+          },
+          {
+            "id": 232,
+            "name": "Data Analyst",
+            "slug": "data-analyst",
+            "skills": ["SQL", "Excel", "Python", "R", "Tableau"]
+          },
+          {
+            "id": 233,
+            "name": "Business Analyst",
+            "slug": "business-analyst",
+            "skills": ["SQL", "Excel", "Power BI", "Requirements Analysis", "Process Mapping"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "DevOps & Cloud",
+    "slug": "devops-cloud",
+    "description": "Infrastructure automation and cloud solutions",
+    "icon": "fas fa-cloud",
+    "color": "#8B5CF6",
+    "subcategories": [
+      {
+        "id": 31,
+        "name": "DevOps Engineering",
+        "slug": "devops-engineering",
+        "description": "Continuous integration and deployment",
+        "specializations": [
+          {
+            "id": 311,
+            "name": "DevOps Engineer",
+            "slug": "devops-engineer",
+            "skills": ["Docker", "Kubernetes", "Jenkins", "Git", "Linux"]
+          },
+          {
+            "id": 312,
+            "name": "Site Reliability Engineer",
+            "slug": "site-reliability-engineer",
+            "skills": ["Kubernetes", "Prometheus", "Grafana", "Python", "Go"]
+          },
+          {
+            "id": 313,
+            "name": "Platform Engineer",
+            "slug": "platform-engineer",
+            "skills": ["Kubernetes", "Terraform", "Helm", "GitOps", "Monitoring"]
+          }
+        ]
+      },
+      {
+        "id": 32,
+        "name": "Cloud Architecture",
+        "slug": "cloud-architecture",
+        "description": "Cloud infrastructure design and implementation",
+        "specializations": [
+          {
+            "id": 321,
+            "name": "AWS Solutions Architect",
+            "slug": "aws-solutions-architect",
+            "skills": ["AWS", "CloudFormation", "Lambda", "EC2", "RDS"]
+          },
+          {
+            "id": 322,
+            "name": "Azure Cloud Architect",
+            "slug": "azure-cloud-architect",
+            "skills": ["Microsoft Azure", "ARM Templates", "Azure Functions", "CosmosDB"]
+          },
+          {
+            "id": 323,
+            "name": "Google Cloud Architect",
+            "slug": "gcp-architect",
+            "skills": ["Google Cloud", "Terraform", "BigQuery", "Cloud Functions", "GKE"]
+          }
+        ]
+      },
+      {
+        "id": 33,
+        "name": "Infrastructure Engineering",
+        "slug": "infrastructure-engineering",
+        "description": "System administration and infrastructure management",
+        "specializations": [
+          {
+            "id": 331,
+            "name": "Linux System Administrator",
+            "slug": "linux-sysadmin",
+            "skills": ["Linux", "Bash", "Ansible", "Monitoring", "Security"]
+          },
+          {
+            "id": 332,
+            "name": "Network Engineer",
+            "slug": "network-engineer",
+            "skills": ["Networking", "Cisco", "Firewall", "VPN", "Security"]
+          },
+          {
+            "id": 333,
+            "name": "Security Engineer",
+            "slug": "security-engineer",
+            "skills": ["Cybersecurity", "Penetration Testing", "SIEM", "Compliance", "Risk Assessment"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Design & Creative",
+    "slug": "design-creative",
+    "description": "Visual design and user experience",
+    "icon": "fas fa-paint-brush",
+    "color": "#F59E0B",
+    "subcategories": [
+      {
+        "id": 41,
+        "name": "UI/UX Design",
+        "slug": "ui-ux-design",
+        "description": "User interface and experience design",
+        "specializations": [
+          {
+            "id": 411,
+            "name": "UI Designer",
+            "slug": "ui-designer",
+            "skills": ["Figma", "Adobe XD", "Sketch", "Prototyping", "Design Systems"]
+          },
+          {
+            "id": 412,
+            "name": "UX Designer",
+            "slug": "ux-designer",
+            "skills": ["User Research", "Wireframing", "Prototyping", "Usability Testing", "Journey Mapping"]
+          },
+          {
+            "id": 413,
+            "name": "Product Designer",
+            "slug": "product-designer",
+            "skills": ["Design Thinking", "Prototyping", "User Research", "Figma", "Product Strategy"]
+          }
+        ]
+      },
+      {
+        "id": 42,
+        "name": "Graphic Design",
+        "slug": "graphic-design",
+        "description": "Visual communication and branding",
+        "specializations": [
+          {
+            "id": 421,
+            "name": "Brand Designer",
+            "slug": "brand-designer",
+            "skills": ["Adobe Illustrator", "Brand Identity", "Logo Design", "Typography", "Color Theory"]
+          },
+          {
+            "id": 422,
+            "name": "Web Designer",
+            "slug": "web-designer",
+            "skills": ["Adobe Photoshop", "Figma", "HTML/CSS", "Responsive Design", "Typography"]
+          },
+          {
+            "id": 423,
+            "name": "Print Designer",
+            "slug": "print-designer",
+            "skills": ["Adobe InDesign", "Adobe Illustrator", "Typography", "Layout Design", "Print Production"]
+          }
+        ]
+      },
+      {
+        "id": 43,
+        "name": "Digital Media",
+        "slug": "digital-media",
+        "description": "Multimedia content creation",
+        "specializations": [
+          {
+            "id": 431,
+            "name": "Video Editor",
+            "slug": "video-editor",
+            "skills": ["Adobe Premiere Pro", "After Effects", "Final Cut Pro", "Color Grading", "Motion Graphics"]
+          },
+          {
+            "id": 432,
+            "name": "Motion Graphics Designer",
+            "slug": "motion-graphics-designer",
+            "skills": ["After Effects", "Cinema 4D", "Animation", "Video Production", "Creative Suite"]
+          },
+          {
+            "id": 433,
+            "name": "3D Artist",
+            "slug": "3d-artist",
+            "skills": ["Blender", "Maya", "3ds Max", "Substance Painter", "Unreal Engine"]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Marketing & Sales",
+    "slug": "marketing-sales",
+    "description": "Digital marketing and business development",
+    "icon": "fas fa-bullhorn",
+    "color": "#EF4444",
+    "subcategories": [
+      {
+        "id": 51,
+        "name": "Digital Marketing",
+        "slug": "digital-marketing",
+        "description": "Online marketing and promotion strategies",
+        "specializations": [
+          {
+            "id": 511,
+            "name": "SEO Specialist",
+            "slug": "seo-specialist",
+            "skills": ["SEO", "Google Analytics", "Keyword Research", "Link Building", "Content Strategy"]
+          },
+          {
+            "id": 512,
+            "name": "PPC Specialist",
+            "slug": "ppc-specialist",
+            "skills": ["Google Ads", "Facebook Ads", "Campaign Management", "Analytics", "Conversion Optimization"]
+          },
+          {
+            "id": 513,
+            "name": "Social Media Manager",
+            "slug": "social-media-manager",
+            "skills": ["Social Media Strategy", "Content Creation", "Community Management", "Analytics", "Paid Social"]
+          },
+          {
+            "id": 514,
+            "name": "Email Marketing Specialist",
+            "slug": "email-marketing-specialist",
+            "skills": ["Email Automation", "Mailchimp", "A/B Testing", "Segmentation", "Analytics"]
+          }
+        ]
+      },
+      {
+        "id": 52,
+        "name": "Content Marketing",
+        "slug": "content-marketing",
+        "description": "Content creation and strategy",
+        "specializations": [
+          {
+            "id": 521,
+            "name": "Content Writer",
+            "slug": "content-writer",
+            "skills": ["Copywriting", "SEO Writing", "Blog Writing", "Content Strategy", "Research"]
+          },
+          {
+            "id": 522,
+            "name": "Content Strategist",
+            "slug": "content-strategist",
+            "skills": ["Content Planning", "Editorial Calendar", "SEO", "Analytics", "Brand Voice"]
+          },
+          {
+            "id": 523,
+            "name": "Technical Writer",
+            "slug": "technical-writer",
+            "skills": ["Technical Documentation", "API Documentation", "User Manuals", "Software Documentation"]
+          }
+        ]
+      },
+      {
+        "id": 53,
+        "name": "Business Development",
+        "slug": "business-development",
+        "description": "Sales and partnership development",
+        "specializations": [
+          {
+            "id": 531,
+            "name": "Sales Development Representative",
+            "slug": "sales-development-representative",
+            "skills": ["Lead Generation", "Cold Outreach", "CRM", "Prospecting", "Sales Qualification"]
+          },
+          {
+            "id": 532,
+            "name": "Account Executive",
+            "slug": "account-executive",
+            "skills": ["Sales Process", "Negotiation", "Relationship Management", "CRM", "Closing"]
+          },
+          {
+            "id": 533,
+            "name": "Business Development Manager",
+            "slug": "business-development-manager",
+            "skills": ["Partnership Development", "Strategic Planning", "Market Analysis", "Negotiation", "Relationship Building"]
+          }
+        ]
+      }
+    ]
+  }
+]

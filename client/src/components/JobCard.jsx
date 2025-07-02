@@ -1,141 +1,173 @@
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-export function JobCard({ job, onApply }) {
-  const [isSaved, setIsSaved] = useState(false);
-
-  const formatSalary = (min, max, currency = 'USD') => {
-    if (!min && !max) return "Salary not disclosed";
+export default function JobCard({ job }) {
+  const formatSalary = (min, max, currency) => {
+    if (!min || !max) return "Salary not specified";
     
-    const formatAmount = (amount) => {
-      if (currency === 'INR') {
-        if (amount >= 10000000) return `₹${(amount / 10000000).toFixed(1)}Cr`;
-        if (amount >= 100000) return `₹${(amount / 100000).toFixed(0)}L`;
-        return `₹${amount.toLocaleString()}`;
-      } else if (currency === 'USD') {
-        if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
-        if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}K`;
-        return `$${amount.toLocaleString()}`;
-      } else if (currency === 'EUR') {
-        if (amount >= 1000000) return `€${(amount / 1000000).toFixed(1)}M`;
-        if (amount >= 1000) return `€${(amount / 1000).toFixed(0)}K`;
-        return `€${amount.toLocaleString()}`;
-      } else if (currency === 'GBP') {
-        if (amount >= 1000000) return `£${(amount / 1000000).toFixed(1)}M`;
-        if (amount >= 1000) return `£${(amount / 1000).toFixed(0)}K`;
-        return `£${amount.toLocaleString()}`;
-      } else {
-        return `${amount.toLocaleString()}`;
-      }
-    };
-
-    if (min && max) {
-      return `${formatAmount(min)}-${formatAmount(max)} / year`;
-    }
-    return `${formatAmount(min || max)} / year`;
+    const formatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency || 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
+    
+    return `${formatter.format(min)} - ${formatter.format(max)}`;
   };
 
-  const getCompanyInitial = (company) => {
-    const companyName = typeof company === 'string' ? company : company?.name || 'C';
-    return companyName.charAt(0).toUpperCase();
-  };
-
-  const getDaysAgo = (date) => {
-    if (!date) return "Recently posted";
+  const getTimeAgo = (dateString) => {
+    const date = new Date(dateString);
     const now = new Date();
-    const diffTime = Math.abs(now.getTime() - new Date(date).getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
     
-    if (diffDays === 1) return "1 day ago";
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
-    return `${Math.ceil(diffDays / 30)} months ago`;
+    if (diffInHours < 24) {
+      return `${diffInHours} hours ago`;
+    } else {
+      const diffInDays = Math.floor(diffInHours / 24);
+      return `${diffInDays} days ago`;
+    }
   };
 
   return (
-    <Card className="hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 group">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
-              <span className="text-white font-bold text-lg">
-                {getCompanyInitial(job.company)}
-              </span>
-            </div>
-            <div>
-              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-primary transition-colors">
-                {job.title}
-              </h3>
-              <p className="text-slate-600 dark:text-slate-400">
-                {typeof job.company === 'string' ? job.company : (job.company?.name || 'Company')}
-              </p>
-            </div>
+    <Card className="p-6 hover:shadow-lg transition-shadow duration-200 border-slate-200 dark:border-slate-700">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          {job.companyLogo && (
+            <img 
+              src={job.companyLogo} 
+              alt={`${job.company} logo`}
+              className="w-12 h-12 rounded-lg object-cover bg-slate-100 dark:bg-slate-800"
+            />
+          )}
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">
+              {job.title}
+            </h3>
+            <p className="text-slate-600 dark:text-slate-400 text-sm">
+              {job.company}
+            </p>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsSaved(!isSaved)}
-            className="text-slate-400 hover:text-red-500 transition-colors"
-          >
-            <i className={isSaved ? "fas fa-heart text-red-500" : "far fa-heart"}></i>
-          </Button>
         </div>
         
-        <div className="flex flex-wrap gap-2 mb-4">
-          {job.skills?.slice(0, 3).map((skill, index) => (
-            <Badge key={index} variant="secondary" className="font-medium">
+        <div className="text-right">
+          <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
+            {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {job.currency || 'USD'} per year
+          </p>
+        </div>
+      </div>
+
+      {/* Category Hierarchy */}
+      <div className="mb-3">
+        <div className="flex items-center space-x-1 text-xs text-slate-500 dark:text-slate-400">
+          <span>{job.categoryName}</span>
+          {job.subcategoryName && (
+            <>
+              <span>›</span>
+              <span>{job.subcategoryName}</span>
+            </>
+          )}
+          {job.specializationName && (
+            <>
+              <span>›</span>
+              <span className="text-blue-600 dark:text-blue-400 font-medium">
+                {job.specializationName}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Description */}
+      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">
+        {job.description}
+      </p>
+
+      {/* Skills */}
+      <div className="mb-4">
+        <div className="flex flex-wrap gap-1">
+          {job.skills?.slice(0, 6).map((skill, index) => (
+            <Badge 
+              key={index} 
+              variant="outline" 
+              className="text-xs px-2 py-1 bg-slate-50 border-slate-200 text-slate-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300"
+            >
               {skill}
             </Badge>
           ))}
-          {job.skills && job.skills.length > 3 && (
-            <Badge variant="outline" className="font-medium">
-              +{job.skills.length - 3} more
+          {job.skills?.length > 6 && (
+            <Badge variant="outline" className="text-xs px-2 py-1">
+              +{job.skills.length - 6} more
             </Badge>
           )}
         </div>
-        
-        <p className="text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">
-          {job.description}
-        </p>
-        
-        <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400 mb-4">
-          <div className="flex items-center space-x-4">
-            <span className="flex items-center">
-              <i className="fas fa-map-marker-alt mr-1"></i>
-              {job.location}
-            </span>
-            <span className="flex items-center">
-              <i className="fas fa-clock mr-1"></i>
-              {job.jobType}
-            </span>
-            <span className="flex items-center">
-              <i className="fas fa-calendar mr-1"></i>
-              {getDaysAgo(job.postedAt)}
-            </span>
-          </div>
+      </div>
+
+      {/* Job Details */}
+      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-4">
+        <div className="flex items-center space-x-4">
+          <span className="flex items-center space-x-1">
+            <i className="fas fa-map-marker-alt"></i>
+            <span>{job.location}</span>
+          </span>
+          <span className="flex items-center space-x-1">
+            <i className="fas fa-briefcase"></i>
+            <span>{job.jobType}</span>
+          </span>
+          <span className="flex items-center space-x-1">
+            <i className="fas fa-layer-group"></i>
+            <span>{job.experienceLevel}</span>
+          </span>
+          {job.isRemote && (
+            <Badge variant="secondary" className="text-xs bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300">
+              Remote
+            </Badge>
+          )}
         </div>
-        
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              {job.formattedSalary || formatSalary(job.salaryMin, job.salaryMax, job.salaryCurrency)}
-            </span>
-            {job.salaryCurrency && job.salaryCurrency !== 'USD' && (
-              <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                in {job.salaryCurrency}
-              </div>
+        <span>{getTimeAgo(job.postedAt)}</span>
+      </div>
+
+      {/* Benefits */}
+      {job.benefits && job.benefits.length > 0 && (
+        <div className="mb-4">
+          <div className="flex flex-wrap gap-1">
+            {job.benefits.slice(0, 3).map((benefit, index) => (
+              <Badge 
+                key={index} 
+                variant="outline" 
+                className="text-xs px-2 py-1 bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300"
+              >
+                {benefit}
+              </Badge>
+            ))}
+            {job.benefits.length > 3 && (
+              <Badge variant="outline" className="text-xs px-2 py-1">
+                +{job.benefits.length - 3} benefits
+              </Badge>
             )}
           </div>
-          <Button 
-            onClick={() => onApply?.(job)}
-            className="px-6 py-2 bg-primary text-white rounded-full font-medium hover:bg-primary/90 transition-colors"
-          >
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Button variant="outline" size="sm" className="text-xs">
+            View Details
+          </Button>
+          <Button size="sm" className="text-xs bg-blue-600 hover:bg-blue-700">
             Apply Now
           </Button>
         </div>
-      </CardContent>
+        
+        <Button variant="ghost" size="sm" className="text-xs text-slate-500 hover:text-slate-700">
+          <i className="fas fa-bookmark mr-1"></i>
+          Save
+        </Button>
+      </div>
     </Card>
   );
 }

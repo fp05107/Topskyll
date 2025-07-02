@@ -65,6 +65,9 @@ export class MemStorage implements IStorage {
 
   private loadDataFromFiles(readFileSync: any, join: any) {
     try {
+      // Add proper imports for path and fs
+      const path = require('path');
+      const fs = require('fs');
       
       // Load categories
       const categoriesPath = path.join(__dirname, 'data', 'categories.json');

@@ -1,255 +1,234 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import JobCard from "@/components/JobCard";
+import CategoryBrowser from "@/components/CategoryBrowser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { JobCard } from "@/components/JobCard.jsx";
-import { EXPERIENCE_LEVELS, JOB_TYPES, SALARY_RANGES } from "@/lib/constants";
+import { Badge } from "@/components/ui/badge";
 
 export default function JobsByCategory() {
-  const { slug } = useParams();
-  
-  const [filters, setFilters] = useState({
-    search: "",
-    experienceLevel: "all",
-    jobType: "all",
-    salaryRange: "all",
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilters, setSelectedFilters] = useState({
+    categoryId: null,
+    subcategoryId: null,
+    specializationId: null
+  });
+  const [selectedType, setSelectedType] = useState("");
+  const [selectedExperience, setSelectedExperience] = useState("");
+
+  // Fetch job categories for reference
+  const { data: jobCategories = [] } = useQuery({
+    queryKey: ["/api/job-categories"],
+    queryFn: () => fetch("/api/job-categories").then(res => res.json())
   });
 
-  const { data: category } = useQuery({
-    queryKey: ['/api/job-categories/slug', slug],
-    queryFn: async () => {
-      const response = await fetch(`/api/job-categories/slug/${slug}`);
-      if (!response.ok) throw new Error('Failed to fetch category');
-      return response.json();
-    },
-  });
+  // Build query params for filtering
+  const buildJobsQuery = () => {
+    const params = new URLSearchParams();
+    if (selectedFilters.categoryId) params.append('categoryId', selectedFilters.categoryId);
+    if (selectedFilters.subcategoryId) params.append('subcategoryId', selectedFilters.subcategoryId);
+    if (selectedFilters.specializationId) params.append('specializationId', selectedFilters.specializationId);
+    if (selectedType) params.append('jobType', selectedType);
+    if (selectedExperience) params.append('experienceLevel', selectedExperience);
+    if (searchQuery) params.append('search', searchQuery);
+    
+    return params.toString() ? `?${params.toString()}` : '';
+  };
 
   const { data: jobs = [], isLoading } = useQuery({
-    queryKey: ['/api/jobs', { categorySlug: slug, ...filters }],
-    queryFn: async () => {
-      const params = new URLSearchParams();
-      
-      params.append('categorySlug', slug);
-      if (filters.search) params.append('search', filters.search);
-      if (filters.experienceLevel && filters.experienceLevel !== 'all') params.append('experienceLevel', filters.experienceLevel);
-      if (filters.jobType && filters.jobType !== 'all') params.append('jobType', filters.jobType);
-      
-      if (filters.salaryRange && filters.salaryRange !== 'all') {
-        const [min, max] = filters.salaryRange.split('-');
-        if (min) params.append('salaryMin', min);
-        if (max && max !== 'undefined') params.append('salaryMax', max);
-      }
-
-      const response = await fetch(`/api/jobs?${params.toString()}`);
-      if (!response.ok) throw new Error('Failed to fetch jobs');
-      return response.json();
-    },
-    enabled: !!slug,
+    queryKey: ["/api/jobs", selectedFilters, selectedType, selectedExperience, searchQuery],
+    queryFn: () => fetch(`/api/jobs${buildJobsQuery()}`).then(res => res.json())
   });
 
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+  // Get selected category objects for display
+  const getSelectedCategoryObjects = () => {
+    if (!jobCategories.length || !selectedFilters.categoryId) return {};
+    
+    const category = jobCategories.find(cat => cat.id === selectedFilters.categoryId);
+    if (!category) return {};
+    
+    const result = { selectedCategory: category };
+    
+    if (selectedFilters.subcategoryId && category.subcategories) {
+      const subcategory = category.subcategories.find(sub => sub.id === selectedFilters.subcategoryId);
+      if (subcategory) {
+        result.selectedSubcategory = subcategory;
+        
+        if (selectedFilters.specializationId && subcategory.specializations) {
+          const specialization = subcategory.specializations.find(spec => spec.id === selectedFilters.specializationId);
+          if (specialization) result.selectedSpecialization = specialization;
+        }
+      }
+    }
+    
+    return result;
   };
 
-  const clearFilters = () => {
-    setFilters({
-      search: "",
-      experienceLevel: "all",
-      jobType: "all",
-      salaryRange: "all",
-    });
+  const { selectedCategory, selectedSubcategory, selectedSpecialization } = getSelectedCategoryObjects();
+
+  const handleCategorySelect = (filters) => {
+    setSelectedFilters(filters);
   };
 
-  if (!category) {
-    return (
-      <div className="min-h-screen pt-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center py-16">
-          <div className="animate-pulse">
-            <div className="h-12 bg-slate-300 dark:bg-slate-700 rounded w-1/2 mx-auto mb-4"></div>
-            <div className="h-6 bg-slate-300 dark:bg-slate-700 rounded w-1/3 mx-auto"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const jobTypes = ["Full-time", "Part-time", "Contract", "Freelance"];
+  const experienceLevels = ["Entry Level", "Mid Level", "Senior Level", "Lead", "Principal"];
 
   return (
     <div className="min-h-screen pt-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className={`w-20 h-20 bg-gradient-to-r ${category.color} rounded-2xl flex items-center justify-center mx-auto mb-6`}>
-            <i className={`${category.icon} text-white text-3xl`}></i>
-          </div>
+        <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-            {category.name} Jobs
+            Browse Jobs by Hierarchical Categories
           </h1>
-          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            {category.description}
+          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-6">
+            Explore our comprehensive 3-level job category system: Category → Subcategory → Specialization
           </p>
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 max-w-2xl mx-auto">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              <strong>Example:</strong> Software Development → Frontend Development → React Developer
+            </p>
+          </div>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-700 mb-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
-            {/* Search */}
-            <div>
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border p-6 mb-8">
+          <div className="flex flex-col md:flex-row gap-4 mb-4">
+            <div className="flex-1">
               <Input
-                placeholder="Search jobs, companies..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
+                type="text"
+                placeholder="Search jobs by title, company, or skills..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full"
               />
             </div>
+          </div>
+          
+          {/* Additional Filters */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            <select
+              value={selectedType}
+              onChange={(e) => setSelectedType(e.target.value)}
+              className="px-3 py-2 border rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+            >
+              <option value="">All Job Types</option>
+              {jobTypes.map(type => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
 
-            {/* Experience Level Filter */}
-            <div>
-              <Select value={filters.experienceLevel} onValueChange={(value) => handleFilterChange('experienceLevel', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Experience" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Levels</SelectItem>
-                  {EXPERIENCE_LEVELS.map((level) => (
-                    <SelectItem key={level.value} value={level.value}>
-                      {level.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            <select
+              value={selectedExperience}
+              onChange={(e) => setSelectedExperience(e.target.value)}
+              className="px-3 py-2 border rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100"
+            >
+              <option value="">All Experience Levels</option>
+              {experienceLevels.map(level => (
+                <option key={level} value={level}>
+                  {level}
+                </option>
+              ))}
+            </select>
 
-            {/* Job Type Filter */}
-            <div>
-              <Select value={filters.jobType} onValueChange={(value) => handleFilterChange('jobType', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Job Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  {JOB_TYPES.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Salary Range Filter */}
-            <div>
-              <Select value={filters.salaryRange} onValueChange={(value) => handleFilterChange('salaryRange', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Salary" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Salaries</SelectItem>
-                  {SALARY_RANGES.map((range) => (
-                    <SelectItem key={range.value} value={range.value}>
-                      {range.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {(selectedType || selectedExperience || searchQuery || selectedFilters.categoryId) && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  setSelectedFilters({ categoryId: null, subcategoryId: null, specializationId: null });
+                  setSelectedType("");
+                  setSelectedExperience("");
+                  setSearchQuery("");
+                }}
+              >
+                Clear All Filters
+              </Button>
+            )}
           </div>
 
-          {/* Clear Filters */}
-          {(filters.search || 
-            filters.experienceLevel !== 'all' || 
-            filters.jobType !== 'all' || 
-            filters.salaryRange !== 'all') && (
-            <div className="mt-4 flex justify-end">
-              <Button variant="outline" onClick={clearFilters}>
-                Clear Filters
-              </Button>
+          {/* Active Filter Summary */}
+          {(selectedFilters.categoryId || searchQuery || selectedType || selectedExperience) && (
+            <div className="flex flex-wrap gap-2 pt-4 border-t">
+              {searchQuery && (
+                <Badge variant="secondary" className="text-xs">
+                  Search: "{searchQuery}"
+                </Badge>
+              )}
+              {selectedType && (
+                <Badge variant="secondary" className="text-xs">
+                  Type: {selectedType}
+                </Badge>
+              )}
+              {selectedExperience && (
+                <Badge variant="secondary" className="text-xs">
+                  Experience: {selectedExperience}
+                </Badge>
+              )}
             </div>
           )}
         </div>
 
-        {/* Results Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
-              {isLoading ? "Loading jobs..." : `${jobs.length} ${category.name} Jobs Found`}
-            </h2>
-            <p className="text-slate-600 dark:text-slate-400">
-              Remote opportunities in {category.name}
-            </p>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <span className="text-sm text-slate-600 dark:text-slate-400">Sort by:</span>
-            <Select defaultValue="newest">
-              <SelectTrigger className="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Newest</SelectItem>
-                <SelectItem value="salary-high">Salary: High to Low</SelectItem>
-                <SelectItem value="salary-low">Salary: Low to High</SelectItem>
-                <SelectItem value="relevance">Relevance</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        {/* Category Browser */}
+        <div className="mb-8">
+          <CategoryBrowser 
+            onCategorySelect={handleCategorySelect}
+            selectedCategory={selectedCategory}
+            selectedSubcategory={selectedSubcategory}
+            selectedSpecialization={selectedSpecialization}
+          />
         </div>
 
-        {/* Job Listings */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-700 animate-pulse">
-                <div className="flex items-start space-x-4 mb-4">
-                  <div className="w-12 h-12 bg-slate-300 dark:bg-slate-700 rounded-xl"></div>
-                  <div className="flex-1">
-                    <div className="h-6 bg-slate-300 dark:bg-slate-700 rounded mb-2"></div>
-                    <div className="h-4 bg-slate-300 dark:bg-slate-700 rounded w-1/2"></div>
-                  </div>
-                </div>
-                <div className="space-y-2 mb-4">
-                  <div className="h-4 bg-slate-300 dark:bg-slate-700 rounded"></div>
-                  <div className="h-4 bg-slate-300 dark:bg-slate-700 rounded w-3/4"></div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <div className="h-6 bg-slate-300 dark:bg-slate-700 rounded w-1/3"></div>
-                  <div className="h-10 bg-slate-300 dark:bg-slate-700 rounded w-24"></div>
-                </div>
-              </div>
-            ))}
+        {/* Job Results */}
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+              Job Results
+              {jobs.length > 0 && (
+                <span className="text-lg font-normal text-slate-600 dark:text-slate-400 ml-2">
+                  ({jobs.length} jobs found)
+                </span>
+              )}
+            </h2>
           </div>
-        ) : jobs.length === 0 ? (
-          <div className="text-center py-16">
-            <div className={`w-24 h-24 bg-gradient-to-r ${category.color} rounded-full flex items-center justify-center mx-auto mb-6 opacity-50`}>
-              <i className={`${category.icon} text-3xl text-white`}></i>
-            </div>
-            <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
-              No {category.name} jobs found
-            </h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-6">
-              Try adjusting your filters or check back later for new opportunities.
-            </p>
-            <Button onClick={clearFilters}>
-              Clear All Filters
-            </Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {jobs.map((job) => (
-              <JobCard key={job.id} job={job} />
-            ))}
-          </div>
-        )}
 
-        {/* Load More */}
-        {jobs.length > 0 && jobs.length % 10 === 0 && (
-          <div className="text-center mt-12">
-            <Button className="px-8 py-3">
-              Load More {category.name} Jobs
-            </Button>
-          </div>
-        )}
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-slate-600 dark:text-slate-400">Loading jobs...</p>
+            </div>
+          ) : jobs.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {jobs.map((job) => (
+                <JobCard key={job.id} job={job} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-24 h-24 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i className="fas fa-layer-group text-3xl text-slate-400"></i>
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+                No jobs found in this category
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
+                Try selecting a different category combination or clear your filters to see all available positions.
+              </p>
+              <Button 
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedFilters({ categoryId: null, subcategoryId: null, specializationId: null });
+                  setSelectedType("");
+                  setSelectedExperience("");
+                }}
+              >
+                Browse All Categories
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

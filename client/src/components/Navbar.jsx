@@ -10,10 +10,11 @@ export default function Navbar() {
 
   const navItems = [
     { href: "/", label: "Home" },
+    { href: "/jobs", label: "Jobs" },
+    { href: "/jobs-by-category", label: "Browse Categories" },
     { href: "/developers", label: "Developers" },
     { href: "/designers", label: "Designers" },
     { href: "/finance", label: "Finance" },
-    { href: "/projects", label: "Projects" },
     { href: "/companies", label: "Companies" },
   ];
 
