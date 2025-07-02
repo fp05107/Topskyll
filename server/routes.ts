@@ -439,14 +439,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Registration endpoints
+  app.post("/api/register/jobseeker", async (req: Request, res: Response) => {
+    try {
+      const data = req.body;
+      
+      // Create talent profile
+      const talentData = {
+        email: data.email,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        title: data.title,
+        bio: data.bio,
+        location: data.location,
+        timezone: data.timezone,
+        hourlyRate: data.hourlyRateMin + '-' + data.hourlyRateMax,
+        experienceLevel: data.experienceLevel,
+        isAvailable: data.isAvailable || true,
+        languages: data.languages ? data.languages.split(',').map((l: string) => l.trim()) : [],
+        skills: data.skills || []
+      };
+
+      const talent = await storage.createTalent(talentData);
+      
+      res.status(201).json({ 
+        success: true, 
+        message: "Registration successful",
+        talentId: talent.id 
+      });
+    } catch (error) {
+      console.error('Job seeker registration error:', error);
+      res.status(400).json({ error: "Registration failed" });
+    }
+  });
+
+  app.post("/api/register/employer", async (req: Request, res: Response) => {
+    try {
+      const data = req.body;
+      
+      // Create company profile
+      const companyData = {
+        name: data.companyName,
+        email: data.email,
+        location: data.location,
+        website: data.website,
+        description: data.description,
+        industry: data.industry,
+        companySize: data.companySize,
+        fundingStage: data.fundingStage,
+        isVerified: false // Requires manual verification
+      };
+
+      const company = await storage.createCompany(companyData);
+      
+      res.status(201).json({ 
+        success: true, 
+        message: "Registration submitted for review",
+        companyId: company.id 
+      });
+    } catch (error) {
+      console.error('Employer registration error:', error);
+      res.status(400).json({ error: "Registration failed" });
+    }
+  });
+
   // Helper function to get top skills
   function getTopSkills(talents: any[]): { skill: string; count: number }[] {
     const skillCounts: { [key: string]: number } = {};
     
     talents.forEach(talent => {
-      talent.skills.forEach((skill: string) => {
-        skillCounts[skill] = (skillCounts[skill] || 0) + 1;
-      });
+      if (talent.skills) {
+        talent.skills.forEach((skill: string) => {
+          skillCounts[skill] = (skillCounts[skill] || 0) + 1;
+        });
+      }
     });
 
     return Object.entries(skillCounts)

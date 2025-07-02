@@ -9,6 +9,13 @@ import Jobs from "@/pages/Jobs";
 import JobsByCategory from "@/pages/JobsByCategory";
 import About from "@/pages/About";
 import TalentCategory from "@/pages/TalentCategory";
+import UserDirectory from "@/pages/UserDirectory";
+import ProfileDetails from "@/pages/ProfileDetails";
+import JobDetails from "@/pages/JobDetails";
+import JobSeekerRegistration from "@/pages/JobSeekerRegistration";
+import EmployerRegistration from "@/pages/EmployerRegistration";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,9 +36,16 @@ function App() {
             <Switch>
               <Route path="/" component={Home} />
               <Route path="/jobs" component={Jobs} />
+              <Route path="/jobs/:id" component={JobDetails} />
               <Route path="/jobs-by-category" component={JobsByCategory} />
               <Route path="/about" component={About} />
               <Route path="/talents/:category" component={TalentCategory} />
+              <Route path="/directory" component={UserDirectory} />
+              <Route path="/profile/:id" component={ProfileDetails} />
+              <Route path="/register/jobseeker" component={JobSeekerRegistration} />
+              <Route path="/register/employer" component={EmployerRegistration} />
+              <Route path="/login" component={Login} />
+              <Route path="/signup" component={Signup} />
               <Route path="/how-it-works">
                 <div className="container mx-auto px-4 py-20 min-h-screen pt-20">
                   <h1 className="text-4xl font-bold mb-8 text-slate-900 dark:text-slate-100">How TopSkyll Works</h1>
