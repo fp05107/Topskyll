@@ -11,10 +11,7 @@ export default function Navbar() {
   const navItems = [
     { href: "/", label: "Home" },
     { href: "/jobs", label: "Jobs" },
-    { href: "/jobs-by-category", label: "Browse Categories" },
-    { href: "/developers", label: "Developers" },
-    { href: "/designers", label: "Designers" },
-    { href: "/finance", label: "Finance" },
+    { href: "/tech-categories", label: "Tech Categories" },
     { href: "/companies", label: "Companies" },
   ];
 
@@ -69,15 +66,15 @@ export default function Navbar() {
               )}
             </Button>
             
-            <Link href="/apply">
+            <Link href="/register/jobseeker">
               <Button variant="outline" size="sm">
-                Apply as Talent
+                Register as Job Seeker
               </Button>
             </Link>
             
-            <Link href="/hire">
+            <Link href="/register/employer">
               <Button size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                Hire Talent
+                Register as Employer
               </Button>
             </Link>
           </div>
@@ -128,24 +125,24 @@ export default function Navbar() {
               ))}
               
               <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
-                <Link href="/apply">
+                <Link href="/register/jobseeker">
                   <Button 
                     variant="outline" 
                     size="sm" 
                     className="w-full mb-2"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Apply as Talent
+                    Register as Job Seeker
                   </Button>
                 </Link>
                 
-                <Link href="/hire">
+                <Link href="/register/employer">
                   <Button 
                     size="sm" 
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    Hire Talent
+                    Register as Employer
                   </Button>
                 </Link>
               </div>

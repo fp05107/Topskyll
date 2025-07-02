@@ -66,16 +66,16 @@ export default function EmployerRegistration() {
   ];
 
   const hiringNeeds = [
-    'Software Developers',
-    'Designers',
-    'Data Scientists',
-    'Marketing Experts',
-    'Project Managers',
-    'DevOps Engineers',
-    'AI/ML Engineers',
-    'Cybersecurity Experts',
-    'Product Managers',
-    'Sales Representatives'
+    'Software Development',
+    'Data Science & Analytics',
+    'DevOps & Cloud',
+    'Design & Creative',
+    'Marketing & Sales',
+    'Product Management',
+    'Cybersecurity',
+    'QA & Testing',
+    'Technical Writing',
+    'Architecture & Engineering'
   ];
 
   const nextStep = () => {

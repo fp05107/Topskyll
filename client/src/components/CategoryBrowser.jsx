@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronRight, ArrowLeft, Code, Database, Cloud, Palette, Megaphone, Shield } from "lucide-react";
 
 export default function CategoryBrowser({ onCategorySelect, selectedCategory, selectedSubcategory, selectedSpecialization }) {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentView, setCurrentView] = useState('categories'); // 'categories', 'subcategories', 'specializations'
+  const [selectedCategoryData, setSelectedCategoryData] = useState(null);
+  const [selectedSubcategoryData, setSelectedSubcategoryData] = useState(null);
 
   useEffect(() => {
     fetchCategories();
@@ -24,36 +27,66 @@ export default function CategoryBrowser({ onCategorySelect, selectedCategory, se
     }
   };
 
+  const getCategoryIcon = (categoryName) => {
+    switch (categoryName.toLowerCase()) {
+      case 'software development':
+        return <Code className="h-6 w-6" />;
+      case 'data science & analytics':
+        return <Database className="h-6 w-6" />;
+      case 'devops & cloud':
+        return <Cloud className="h-6 w-6" />;
+      case 'design & creative':
+        return <Palette className="h-6 w-6" />;
+      case 'marketing & sales':
+        return <Megaphone className="h-6 w-6" />;
+      case 'cybersecurity':
+        return <Shield className="h-6 w-6" />;
+      default:
+        return <Code className="h-6 w-6" />;
+    }
+  };
+
   const handleCategoryClick = (category) => {
-    onCategorySelect({
-      categoryId: category.id,
-      subcategoryId: null,
-      specializationId: null
-    });
+    setSelectedCategoryData(category);
+    setCurrentView('subcategories');
   };
 
-  const handleSubcategoryClick = (category, subcategory) => {
-    onCategorySelect({
-      categoryId: category.id,
-      subcategoryId: subcategory.id,
-      specializationId: null
-    });
+  const handleSubcategoryClick = (subcategory) => {
+    setSelectedSubcategoryData(subcategory);
+    setCurrentView('specializations');
   };
 
-  const handleSpecializationClick = (category, subcategory, specialization) => {
-    onCategorySelect({
-      categoryId: category.id,
-      subcategoryId: subcategory.id,
-      specializationId: specialization.id
-    });
+  const handleSpecializationClick = (specialization) => {
+    if (onCategorySelect) {
+      onCategorySelect({
+        categoryId: selectedCategoryData.id,
+        categoryName: selectedCategoryData.name,
+        subcategoryId: selectedSubcategoryData.id,
+        subcategoryName: selectedSubcategoryData.name,
+        specializationId: specialization.id,
+        specializationName: specialization.name,
+        skills: specialization.skills || []
+      });
+    }
   };
 
-  const clearFilters = () => {
-    onCategorySelect({
-      categoryId: null,
-      subcategoryId: null,
-      specializationId: null
-    });
+  const goBack = () => {
+    if (currentView === 'specializations') {
+      setCurrentView('subcategories');
+      setSelectedSubcategoryData(null);
+    } else if (currentView === 'subcategories') {
+      setCurrentView('categories');
+      setSelectedCategoryData(null);
+    }
+  };
+
+  const resetSelection = () => {
+    setCurrentView('categories');
+    setSelectedCategoryData(null);
+    setSelectedSubcategoryData(null);
+    if (onCategorySelect) {
+      onCategorySelect(null);
+    }
   };
 
   if (loading) {
@@ -66,197 +99,178 @@ export default function CategoryBrowser({ onCategorySelect, selectedCategory, se
 
   return (
     <div className="space-y-6">
-      {/* Active Filters */}
-      {(selectedCategory || selectedSubcategory || selectedSpecialization) && (
-        <Card className="p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                Active Filters:
-              </span>
-              <div className="flex items-center space-x-1 text-sm text-blue-700 dark:text-blue-300">
-                {selectedCategory && <span>{selectedCategory.name}</span>}
-                {selectedSubcategory && (
-                  <>
-                    <span>›</span>
-                    <span>{selectedSubcategory.name}</span>
-                  </>
-                )}
-                {selectedSpecialization && (
-                  <>
-                    <span>›</span>
-                    <span className="font-medium">{selectedSpecialization.name}</span>
-                  </>
-                )}
-              </div>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={clearFilters}
-              className="text-blue-700 hover:text-blue-900 dark:text-blue-300 dark:hover:text-blue-100"
-            >
-              Clear All
+      {/* Navigation Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          {currentView !== 'categories' && (
+            <Button variant="ghost" size="sm" onClick={goBack} className="flex items-center space-x-1">
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back</span>
             </Button>
+          )}
+          <div className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400">
+            <span 
+              onClick={() => setCurrentView('categories')}
+              className={`cursor-pointer ${currentView === 'categories' ? 'font-medium text-slate-900 dark:text-slate-100' : 'hover:text-slate-900 dark:hover:text-slate-100'}`}
+            >
+              Categories
+            </span>
+            {selectedCategoryData && (
+              <>
+                <ChevronRight className="h-4 w-4" />
+                <span 
+                  onClick={() => setCurrentView('subcategories')}
+                  className={`cursor-pointer ${currentView === 'subcategories' ? 'font-medium text-slate-900 dark:text-slate-100' : 'hover:text-slate-900 dark:hover:text-slate-100'}`}
+                >
+                  {selectedCategoryData.name}
+                </span>
+              </>
+            )}
+            {selectedSubcategoryData && (
+              <>
+                <ChevronRight className="h-4 w-4" />
+                <span className="font-medium text-slate-900 dark:text-slate-100">
+                  {selectedSubcategoryData.name}
+                </span>
+              </>
+            )}
           </div>
-        </Card>
-      )}
-
-      {/* Categories */}
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="all">All Categories</TabsTrigger>
-          <TabsTrigger value="software">Software</TabsTrigger>
-          <TabsTrigger value="data">Data & AI</TabsTrigger>
-          <TabsTrigger value="devops">DevOps</TabsTrigger>
-          <TabsTrigger value="design">Design</TabsTrigger>
-          <TabsTrigger value="marketing">Marketing</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all" className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categories.map((category) => (
-              <CategoryCard 
-                key={category.id} 
-                category={category}
-                isSelected={selectedCategory?.id === category.id}
-                onCategoryClick={handleCategoryClick}
-                onSubcategoryClick={handleSubcategoryClick}
-                onSpecializationClick={handleSpecializationClick}
-                selectedSubcategory={selectedSubcategory}
-                selectedSpecialization={selectedSpecialization}
-              />
-            ))}
-          </div>
-        </TabsContent>
-
-        {categories.map((category) => (
-          <TabsContent 
-            key={category.slug} 
-            value={category.slug.split('-')[0]} 
-            className="space-y-4"
-          >
-            <CategoryCard 
-              category={category}
-              isSelected={selectedCategory?.id === category.id}
-              onCategoryClick={handleCategoryClick}
-              onSubcategoryClick={handleSubcategoryClick}
-              onSpecializationClick={handleSpecializationClick}
-              selectedSubcategory={selectedSubcategory}
-              selectedSpecialization={selectedSpecialization}
-              expanded={true}
-            />
-          </TabsContent>
-        ))}
-      </Tabs>
-    </div>
-  );
-}
-
-function CategoryCard({ 
-  category, 
-  isSelected, 
-  onCategoryClick, 
-  onSubcategoryClick, 
-  onSpecializationClick, 
-  selectedSubcategory, 
-  selectedSpecialization,
-  expanded = false 
-}) {
-  const [isExpanded, setIsExpanded] = useState(expanded);
-
-  const handleCategoryClick = () => {
-    onCategoryClick(category);
-    setIsExpanded(!isExpanded);
-  };
-
-  return (
-    <Card className={`p-4 transition-all duration-200 ${
-      isSelected 
-        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400' 
-        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-    }`}>
-      <div 
-        className="cursor-pointer"
-        onClick={handleCategoryClick}
-      >
-        <div className="flex items-center space-x-3 mb-2">
-          <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white`}
-               style={{ backgroundColor: category.color }}>
-            <i className={category.icon}></i>
-          </div>
-          <div className="flex-1">
-            <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-              {category.name}
-            </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              {category.description}
-            </p>
-          </div>
-          <i className={`fas fa-chevron-${isExpanded ? 'up' : 'down'} text-slate-400`}></i>
         </div>
+        {(selectedCategoryData || selectedSubcategoryData) && (
+          <Button variant="outline" size="sm" onClick={resetSelection}>
+            Clear Selection
+          </Button>
+        )}
       </div>
 
-      {isExpanded && category.subcategories && (
-        <div className="mt-4 space-y-3 border-t pt-4">
-          {category.subcategories.map((subcategory) => (
-            <div key={subcategory.id}>
-              <div 
-                className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
-                  selectedSubcategory?.id === subcategory.id
-                    ? 'bg-blue-100 dark:bg-blue-800/30'
-                    : 'hover:bg-slate-100 dark:hover:bg-slate-800'
-                }`}
-                onClick={() => onSubcategoryClick(category, subcategory)}
-              >
-                <div>
-                  <h4 className="font-medium text-slate-900 dark:text-slate-100">
-                    {subcategory.name}
-                  </h4>
-                  <p className="text-xs text-slate-600 dark:text-slate-400">
-                    {subcategory.description}
-                  </p>
+      {/* Categories View */}
+      {currentView === 'categories' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {categories.map((category) => (
+            <Card 
+              key={category.id} 
+              className="cursor-pointer hover:shadow-md transition-shadow border-l-4"
+              style={{ borderLeftColor: category.color }}
+              onClick={() => handleCategoryClick(category)}
+            >
+              <CardHeader className="pb-3">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+                    {getCategoryIcon(category.name)}
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">{category.name}</CardTitle>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                      {category.description}
+                    </p>
+                  </div>
                 </div>
-                <Badge variant="secondary" className="text-xs">
-                  {subcategory.specializations?.length || 0} specs
-                </Badge>
-              </div>
-
-              {selectedSubcategory?.id === subcategory.id && subcategory.specializations && (
-                <div className="mt-2 ml-4 space-y-1">
-                  {subcategory.specializations.map((specialization) => (
-                    <div 
-                      key={specialization.id}
-                      className={`flex items-center justify-between p-2 rounded cursor-pointer transition-colors ${
-                        selectedSpecialization?.id === specialization.id
-                          ? 'bg-blue-200 dark:bg-blue-700/40'
-                          : 'hover:bg-slate-50 dark:hover:bg-slate-700'
-                      }`}
-                      onClick={() => onSpecializationClick(category, subcategory, specialization)}
-                    >
-                      <span className="text-sm font-medium text-slate-900 dark:text-slate-100">
-                        {specialization.name}
-                      </span>
-                      <div className="flex flex-wrap gap-1">
-                        {specialization.skills?.slice(0, 3).map((skill, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                        {specialization.skills?.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{specialization.skills.length - 3}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="flex items-center justify-between">
+                  <Badge variant="secondary">
+                    {category.subcategories?.length || 0} subcategories
+                  </Badge>
+                  <ChevronRight className="h-4 w-4 text-slate-400" />
                 </div>
-              )}
-            </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       )}
-    </Card>
+
+      {/* Subcategories View */}
+      {currentView === 'subcategories' && selectedCategoryData && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                {selectedCategoryData.name}
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400">
+                {selectedCategoryData.description}
+              </p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {selectedCategoryData.subcategories?.map((subcategory) => (
+              <Card 
+                key={subcategory.id}
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => handleSubcategoryClick(subcategory)}
+              >
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">{subcategory.name}</CardTitle>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    {subcategory.description}
+                  </p>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="secondary">
+                      {subcategory.specializations?.length || 0} specializations
+                    </Badge>
+                    <ChevronRight className="h-4 w-4 text-slate-400" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Specializations View */}
+      {currentView === 'specializations' && selectedSubcategoryData && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                {selectedSubcategoryData.name}
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400">
+                {selectedSubcategoryData.description}
+              </p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {selectedSubcategoryData.specializations?.map((specialization) => (
+              <Card 
+                key={specialization.id}
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => handleSpecializationClick(specialization)}
+              >
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg">{specialization.name}</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap gap-1">
+                      {specialization.skills?.slice(0, 4).map((skill, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
+                      {specialization.skills?.length > 4 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{specialization.skills.length - 4} more
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-slate-600 dark:text-slate-400">
+                        Click to filter jobs
+                      </span>
+                      <ChevronRight className="h-4 w-4 text-slate-400" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

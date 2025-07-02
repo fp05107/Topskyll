@@ -39,14 +39,14 @@ export default function JobSeekerRegistration() {
   const totalSteps = 5;
 
   const categories = [
-    'Software Developers',
-    'Designers', 
-    'Data Scientists',
-    'Marketing Experts',
-    'Project Managers',
-    'DevOps Engineers',
-    'AI/ML Engineers',
-    'Cybersecurity Experts'
+    'Software Development',
+    'Data Science & Analytics', 
+    'DevOps & Cloud',
+    'Design & Creative',
+    'Marketing & Sales',
+    'Product Management',
+    'Cybersecurity',
+    'QA & Testing'
   ];
 
   const skillsSuggestions = [

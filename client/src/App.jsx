@@ -14,6 +14,7 @@ import ProfileDetails from "@/pages/ProfileDetails";
 import JobDetails from "@/pages/JobDetails";
 import JobSeekerRegistration from "@/pages/JobSeekerRegistration";
 import EmployerRegistration from "@/pages/EmployerRegistration";
+import TechCategories from "@/pages/TechCategories";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 
@@ -38,6 +39,7 @@ function App() {
               <Route path="/jobs" component={Jobs} />
               <Route path="/jobs/:id" component={JobDetails} />
               <Route path="/jobs-by-category" component={JobsByCategory} />
+              <Route path="/tech-categories" component={TechCategories} />
               <Route path="/about" component={About} />
               <Route path="/talents/:category" component={TalentCategory} />
               <Route path="/directory" component={UserDirectory} />
