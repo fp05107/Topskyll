@@ -1,5 +1,6 @@
 import { Express, Request, Response } from "express";
 import { Server } from "http";
+import { createServer } from "http";
 import { storage } from "./storage";
 import { insertTalentSchema, insertCompanySchema, insertJobSchema, insertProposalSchema } from "../shared/schema";
 
@@ -297,6 +298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       .slice(0, 20);
   }
 
-  // Return a mock server since the app is already listening in index.ts
-  return {} as Server;
+  // Create and return the HTTP server
+  const server = createServer(app);
+  return server;
 }

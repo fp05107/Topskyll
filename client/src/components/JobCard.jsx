@@ -38,7 +38,8 @@ export function JobCard({ job, onApply }) {
   };
 
   const getCompanyInitial = (company) => {
-    return company.charAt(0).toUpperCase();
+    const companyName = typeof company === 'string' ? company : company?.name || 'C';
+    return companyName.charAt(0).toUpperCase();
   };
 
   const getDaysAgo = (date) => {
@@ -67,7 +68,9 @@ export function JobCard({ job, onApply }) {
               <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-primary transition-colors">
                 {job.title}
               </h3>
-              <p className="text-slate-600 dark:text-slate-400">{job.company}</p>
+              <p className="text-slate-600 dark:text-slate-400">
+                {typeof job.company === 'string' ? job.company : (job.company?.name || 'Company')}
+              </p>
             </div>
           </div>
           <Button
