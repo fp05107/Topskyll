@@ -1,276 +1,550 @@
-import { 
-  users, 
-  jobs, 
-  jobCategories, 
-  jobApplications,
-  type User, 
-  type InsertUser,
-  type Job,
-  type InsertJob,
-  type JobCategory,
-  type InsertJobCategory,
-  type JobApplication,
-  type InsertJobApplication
-} from "@shared/schema";
+import {
+  Talent, InsertTalent,
+  TalentCategory, InsertTalentCategory,
+  Company, InsertCompany,
+  Job, InsertJob,
+  Proposal, InsertProposal,
+  Contract, InsertContract,
+  Review, InsertReview
+} from "../shared/schema";
 
 export interface IStorage {
-  // Users
-  getUser(id: number): Promise<User | undefined>;
-  getUserByEmail(email: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  updateUser(id: number, user: Partial<InsertUser>): Promise<User | undefined>;
+  // Talents
+  getAllTalents(filters?: {
+    category?: string;
+    experienceLevel?: string;
+    hourlyRateMin?: number;
+    hourlyRateMax?: number;
+    location?: string;
+    skills?: string[];
+    isAvailable?: boolean;
+    verificationLevel?: string;
+    search?: string;
+  }): Promise<Talent[]>;
+  getTalent(id: number): Promise<Talent | undefined>;
+  getTalentByEmail(email: string): Promise<Talent | undefined>;
+  createTalent(talent: InsertTalent): Promise<Talent>;
+  updateTalent(id: number, talent: Partial<InsertTalent>): Promise<Talent | undefined>;
 
-  // Job Categories
-  getAllJobCategories(): Promise<JobCategory[]>;
-  getJobCategory(id: number): Promise<JobCategory | undefined>;
-  getJobCategoryBySlug(slug: string): Promise<JobCategory | undefined>;
-  createJobCategory(category: InsertJobCategory): Promise<JobCategory>;
+  // Talent Categories
+  getAllTalentCategories(): Promise<TalentCategory[]>;
+  getTalentCategory(id: number): Promise<TalentCategory | undefined>;
+  getTalentCategoryBySlug(slug: string): Promise<TalentCategory | undefined>;
+  createTalentCategory(category: InsertTalentCategory): Promise<TalentCategory>;
+
+  // Companies
+  getAllCompanies(): Promise<Company[]>;
+  getCompany(id: number): Promise<Company | undefined>;
+  getCompanyByEmail(email: string): Promise<Company | undefined>;
+  createCompany(company: InsertCompany): Promise<Company>;
+  updateCompany(id: number, company: Partial<InsertCompany>): Promise<Company | undefined>;
 
   // Jobs
   getAllJobs(filters?: {
+    companyId?: number;
     categoryId?: number;
     experienceLevel?: string;
     jobType?: string;
-    salaryMin?: number;
-    salaryMax?: number;
+    budgetMin?: number;
+    budgetMax?: number;
+    isRemote?: boolean;
     search?: string;
   }): Promise<Job[]>;
   getJob(id: number): Promise<Job | undefined>;
-  getJobsByCategory(categoryId: number): Promise<Job[]>;
   createJob(job: InsertJob): Promise<Job>;
   updateJob(id: number, job: Partial<InsertJob>): Promise<Job | undefined>;
 
-  // Job Applications
-  getJobApplicationsByUser(userId: number): Promise<JobApplication[]>;
-  getJobApplicationsByJob(jobId: number): Promise<JobApplication[]>;
-  createJobApplication(application: InsertJobApplication): Promise<JobApplication>;
-  getJobApplication(jobId: number, userId: number): Promise<JobApplication | undefined>;
+  // Proposals
+  getProposalsByJob(jobId: number): Promise<Proposal[]>;
+  getProposalsByTalent(talentId: number): Promise<Proposal[]>;
+  getProposal(id: number): Promise<Proposal | undefined>;
+  createProposal(proposal: InsertProposal): Promise<Proposal>;
+  updateProposal(id: number, proposal: Partial<InsertProposal>): Promise<Proposal | undefined>;
+
+  // Contracts
+  getContractsByCompany(companyId: number): Promise<Contract[]>;
+  getContractsByTalent(talentId: number): Promise<Contract[]>;
+  getContract(id: number): Promise<Contract | undefined>;
+  createContract(contract: InsertContract): Promise<Contract>;
+  updateContract(id: number, contract: Partial<InsertContract>): Promise<Contract | undefined>;
+
+  // Reviews
+  getReviewsByTalent(talentId: number): Promise<Review[]>;
+  getReviewsByCompany(companyId: number): Promise<Review[]>;
+  createReview(review: InsertReview): Promise<Review>;
 }
 
 export class MemStorage implements IStorage {
-  private users: Map<number, User>;
+  private talents: Map<number, Talent>;
+  private talentCategories: Map<number, TalentCategory>;  
+  private companies: Map<number, Company>;
   private jobs: Map<number, Job>;
-  private jobCategories: Map<number, JobCategory>;
-  private jobApplications: Map<number, JobApplication>;
-  private currentUserId: number;
-  private currentJobId: number;
+  private proposals: Map<number, Proposal>;
+  private contracts: Map<number, Contract>;
+  private reviews: Map<number, Review>;
+  private currentTalentId: number;
   private currentCategoryId: number;
-  private currentApplicationId: number;
+  private currentCompanyId: number;
+  private currentJobId: number;
+  private currentProposalId: number;
+  private currentContractId: number;
+  private currentReviewId: number;
 
   constructor() {
-    this.users = new Map();
+    this.talents = new Map();
+    this.talentCategories = new Map();
+    this.companies = new Map();
     this.jobs = new Map();
-    this.jobCategories = new Map();
-    this.jobApplications = new Map();
-    this.currentUserId = 1;
-    this.currentJobId = 1;
+    this.proposals = new Map();
+    this.contracts = new Map();
+    this.reviews = new Map();
+    this.currentTalentId = 1;
     this.currentCategoryId = 1;
-    this.currentApplicationId = 1;
-
-    // Seed initial data
+    this.currentCompanyId = 1;
+    this.currentJobId = 1;
+    this.currentProposalId = 1;
+    this.currentContractId = 1;
+    this.currentReviewId = 1;
     this.seedData();
   }
 
   private seedData() {
-    // Seed job categories
-    const categories: InsertJobCategory[] = [
-      { name: "Cloud Computing", description: "AWS, Azure, GCP", icon: "fas fa-cloud", slug: "cloud-computing", color: "from-blue-500 to-cyan-500" },
-      { name: "AI & Machine Learning", description: "Python, TensorFlow, PyTorch", icon: "fas fa-brain", slug: "ai-ml", color: "from-purple-500 to-pink-500" },
-      { name: "Cybersecurity", description: "Ethical Hacking, Compliance", icon: "fas fa-shield-alt", slug: "cybersecurity", color: "from-red-500 to-orange-500" },
-      { name: "Data Science & Analytics", description: "Analytics, Visualization, Big Data", icon: "fas fa-chart-line", slug: "data-science", color: "from-green-500 to-teal-500" },
-      { name: "Software Development", description: "Python, Java, JavaScript, React", icon: "fas fa-code", slug: "software-development", color: "from-indigo-500 to-blue-500" },
-      { name: "Frontend Development", description: "React, Vue, Angular, HTML/CSS", icon: "fab fa-react", slug: "frontend-development", color: "from-blue-400 to-indigo-500" },
-      { name: "Backend Development", description: "Node.js, Django, Spring Boot", icon: "fas fa-server", slug: "backend-development", color: "from-gray-500 to-slate-600" },
-      { name: "Full Stack Development", description: "MERN, MEAN, Django+React", icon: "fas fa-layer-group", slug: "fullstack-development", color: "from-purple-400 to-blue-500" },
-      { name: "Mobile App Development", description: "React Native, Flutter, Swift", icon: "fas fa-mobile-alt", slug: "mobile-development", color: "from-green-400 to-blue-500" },
-      { name: "Blockchain & Web3", description: "Smart Contracts, DeFi, NFTs", icon: "fab fa-bitcoin", slug: "blockchain-web3", color: "from-yellow-500 to-orange-500" },
-      { name: "UI/UX Design", description: "Figma, Adobe XD, User Research", icon: "fas fa-palette", slug: "ui-ux-design", color: "from-pink-500 to-rose-500" },
-      { name: "DevOps & CI/CD", description: "Docker, Kubernetes, Jenkins", icon: "fas fa-cogs", slug: "devops-cicd", color: "from-emerald-500 to-green-500" },
-      { name: "Robotic Process Automation", description: "UiPath, Blue Prism, Automation", icon: "fas fa-robot", slug: "rpa", color: "from-violet-500 to-purple-500" },
-      { name: "AR & VR Development", description: "Unity, Unreal Engine, WebXR", icon: "fas fa-vr-cardboard", slug: "ar-vr", color: "from-cyan-500 to-blue-500" },
-      { name: "Database Administration", description: "MySQL, PostgreSQL, MongoDB", icon: "fas fa-database", slug: "database", color: "from-slate-500 to-gray-500" },
-      { name: "Network & Systems Admin", description: "Linux, Windows Server, AWS", icon: "fas fa-network-wired", slug: "network-systems", color: "from-lime-500 to-green-500" },
-      { name: "SAP & ERP Systems", description: "SAP, Oracle, Microsoft Dynamics", icon: "fas fa-chart-bar", slug: "sap-erp", color: "from-orange-500 to-red-500" },
-      { name: "Project Management", description: "Agile, Scrum, PMP, Jira", icon: "fas fa-tasks", slug: "project-management", color: "from-teal-500 to-cyan-500" },
-      { name: "Product Management", description: "Product Strategy, Roadmapping", icon: "fas fa-lightbulb", slug: "product-management", color: "from-amber-500 to-yellow-500" },
-      { name: "Digital Marketing", description: "SEO, SEM, Social Media, Analytics", icon: "fas fa-bullhorn", slug: "digital-marketing", color: "from-rose-500 to-pink-500" },
-      { name: "Sales & Business Dev", description: "B2B Sales, Lead Generation", icon: "fas fa-handshake", slug: "sales-marketing", color: "from-indigo-500 to-purple-500" },
-      { name: "Finance & Accounting", description: "Digital Finance, Fintech, Bookkeeping", icon: "fas fa-calculator", slug: "finance-accounting", color: "from-emerald-500 to-teal-500" },
-      { name: "IT Support & Help Desk", description: "Technical Support, Troubleshooting", icon: "fas fa-tools", slug: "it-support", color: "from-blue-500 to-indigo-500" },
-      { name: "Quality Assurance", description: "Testing, Automation, QA", icon: "fas fa-check-circle", slug: "quality-assurance", color: "from-green-500 to-emerald-500" },
-      { name: "Game Development", description: "Unity, Unreal, C#, Game Design", icon: "fas fa-gamepad", slug: "game-development", color: "from-purple-600 to-pink-500" },
-      { name: "IoT & Embedded Systems", description: "Arduino, Raspberry Pi, Sensors", icon: "fas fa-microchip", slug: "iot-embedded", color: "from-orange-400 to-red-500" },
-      { name: "Technical Writing", description: "Documentation, API Docs, Manuals", icon: "fas fa-pen", slug: "technical-writing", color: "from-blue-300 to-indigo-400" },
-      { name: "Business Intelligence", description: "Tableau, Power BI, Data Warehousing", icon: "fas fa-chart-pie", slug: "business-intelligence", color: "from-green-400 to-teal-500" },
-      { name: "Content Creation", description: "Video Editing, Graphic Design, Writing", icon: "fas fa-video", slug: "content-creation", color: "from-pink-400 to-rose-500" },
-      { name: "Customer Success", description: "Customer Support, Success Management", icon: "fas fa-users", slug: "customer-success", color: "from-cyan-400 to-blue-500" }
+    // Seed Talent Categories
+    const categories: TalentCategory[] = [
+      {
+        id: 1,
+        name: "Software Developers",
+        slug: "developers",
+        description: "Seasoned software engineers, coders, and architects with expertise across hundreds of technologies.",
+        icon: "Code",
+        color: "#3B82F6",
+        skillsRequired: ["JavaScript", "React", "Node.js", "Python", "Java"],
+        averageHourlyRate: "75.00",
+        totalTalents: 12547,
+        isActive: true,
+        order: 1
+      },
+      {
+        id: 2,
+        name: "Designers",
+        slug: "designers", 
+        description: "Expert UI, UX, Visual, and Interaction designers as well as illustrators and animators.",
+        icon: "Palette",
+        color: "#8B5CF6",
+        skillsRequired: ["Figma", "Adobe Creative Suite", "UI/UX Design", "Prototyping"],
+        averageHourlyRate: "65.00",
+        totalTalents: 8934,
+        isActive: true,
+        order: 2
+      },
+      {
+        id: 3,
+        name: "Management Consultants",
+        slug: "management-consultants",
+        description: "Finance experts, business strategists, M&A consultants, and financial modelers.",
+        icon: "TrendingUp",
+        color: "#059669",
+        skillsRequired: ["Financial Modeling", "Strategy", "Market Research", "Business Analysis"],
+        averageHourlyRate: "95.00",
+        totalTalents: 3421,
+        isActive: true,
+        order: 3
+      },
+      {
+        id: 4,
+        name: "Project Managers",
+        slug: "project-managers",
+        description: "Digital and technical project managers, scrum masters with expertise in PM tools.",
+        icon: "Users",
+        color: "#DC2626",
+        skillsRequired: ["Agile", "Scrum", "Jira", "Project Planning", "Team Leadership"],
+        averageHourlyRate: "70.00",
+        totalTalents: 5632,
+        isActive: true,
+        order: 4
+      },
+      {
+        id: 5,
+        name: "Product Managers",
+        slug: "product-managers",
+        description: "Digital product managers and scrum product owners across multiple industries.",
+        icon: "Package",
+        color: "#F59E0B",
+        skillsRequired: ["Product Strategy", "User Research", "Analytics", "Roadmap Planning"],
+        averageHourlyRate: "85.00",
+        totalTalents: 4127,
+        isActive: true,
+        order: 5
+      },
+      {
+        id: 6,
+        name: "Marketing Experts",
+        slug: "marketing",
+        description: "Experts in digital marketing, growth marketing, content creation, and brand strategy.",
+        icon: "Megaphone",
+        color: "#EC4899",
+        skillsRequired: ["Digital Marketing", "SEO", "Content Marketing", "Social Media", "Analytics"],
+        averageHourlyRate: "60.00",
+        totalTalents: 6891,
+        isActive: true,
+        order: 6
+      }
     ];
 
-    categories.forEach(category => this.createJobCategory(category));
+    categories.forEach(category => {
+      this.talentCategories.set(category.id, category);
+      this.currentCategoryId = Math.max(this.currentCategoryId, category.id + 1);
+    });
 
-    // Seed some sample jobs
-    const sampleJobs: InsertJob[] = [
+    // Seed Companies
+    const companies: Company[] = [
       {
-        title: "Senior React Developer",
-        company: "TechCorp Inc.",
-        description: "Join our dynamic team to build cutting-edge web applications using React, Node.js, and modern technologies. Looking for 3+ years experience in full-stack development.",
-        requirements: ["3+ years React experience", "Node.js proficiency", "TypeScript knowledge", "Agile methodology"],
-        skills: ["React", "Node.js", "TypeScript", "JavaScript"],
-        location: "Remote",
-        jobType: "Full Time",
-        experienceLevel: "Mid Level",
-        salaryMin: 1500000,
-        salaryMax: 2500000,
-        categoryId: 5, // Software Development
-        isRemote: true,
+        id: 1,
+        name: "TechCorp",
+        email: "hiring@techcorp.com",
+        logo: "https://via.placeholder.com/100x100?text=TC",
+        website: "https://techcorp.com",
+        description: "Leading technology company building the future of software",
+        industry: "Technology",
+        size: "large",
+        location: "San Francisco, CA",
+        foundedYear: 2015,
+        isVerified: true,
+        totalHired: 45,
+        averageRating: "4.8",
+        createdAt: new Date(),
         isActive: true
       },
       {
-        title: "Data Scientist - AI/ML",
-        company: "DataFlow Systems",
-        description: "Build machine learning models and AI solutions that impact millions of users. Work with large datasets and cutting-edge ML frameworks in our remote-first team.",
-        requirements: ["MS/PhD in Data Science", "Python/R proficiency", "ML frameworks experience", "Statistics knowledge"],
-        skills: ["Python", "TensorFlow", "AWS", "Machine Learning"],
-        location: "Remote",
-        jobType: "Full Time",
-        experienceLevel: "Senior Level",
-        salaryMin: 2000000,
-        salaryMax: 3500000,
-        categoryId: 2, // AI & ML
-        isRemote: true,
-        isActive: true
-      },
-      {
-        title: "Cloud Architect - AWS",
-        company: "CloudTech Solutions",
-        description: "Design and implement scalable cloud infrastructure solutions. Lead cloud migration projects and mentor junior engineers in our growing remote team.",
-        requirements: ["AWS certification", "5+ years cloud experience", "Infrastructure as Code", "Team leadership"],
-        skills: ["AWS", "Kubernetes", "Docker", "Terraform"],
-        location: "Remote",
-        jobType: "Full Time",
-        experienceLevel: "Senior Level",
-        salaryMin: 2500000,
-        salaryMax: 4000000,
-        categoryId: 1, // Cloud Computing
-        isRemote: true,
-        isActive: true
-      },
-      {
-        title: "UX Designer - Product",
-        company: "UserFirst Design",
-        description: "Create exceptional user experiences for our SaaS platform. Collaborate with product managers and engineers to deliver pixel-perfect designs that users love.",
-        requirements: ["3+ years UX design", "Figma expertise", "User research skills", "Portfolio required"],
-        skills: ["Figma", "Design Systems", "User Research", "Prototyping"],
-        location: "Remote",
-        jobType: "Full Time",
-        experienceLevel: "Mid Level",
-        salaryMin: 1200000,
-        salaryMax: 2200000,
-        categoryId: 7, // UI/UX Design
-        isRemote: true,
+        id: 2,
+        name: "Design Studio Pro",
+        email: "projects@designstudio.com",
+        logo: "https://via.placeholder.com/100x100?text=DS",
+        website: "https://designstudio.com",
+        description: "Award-winning design agency specializing in digital experiences",
+        industry: "Design",
+        size: "medium",
+        location: "New York, NY",
+        foundedYear: 2018,
+        isVerified: true,
+        totalHired: 23,
+        averageRating: "4.9",
+        createdAt: new Date(),
         isActive: true
       }
     ];
 
-    sampleJobs.forEach(job => this.createJob(job));
+    companies.forEach(company => {
+      this.companies.set(company.id, company);
+      this.currentCompanyId = Math.max(this.currentCompanyId, company.id + 1);
+    });
+
+    // Seed Talents
+    const talents: Talent[] = [
+      {
+        id: 1,
+        email: "sarah.chen@email.com",
+        firstName: "Sarah",
+        lastName: "Chen",
+        title: "Senior Full-Stack Developer",
+        bio: "Experienced full-stack developer with 8+ years in React, Node.js, and cloud architecture. Previously at Meta and Google.",
+        location: "San Francisco, CA",
+        timezone: "PST",
+        avatar: "https://via.placeholder.com/150x150?text=SC",
+        hourlyRate: "95.00",
+        currency: "USD",
+        yearsOfExperience: 8,
+        languages: [
+          { lang: "English", level: "Native" },
+          { lang: "Mandarin", level: "Fluent" }
+        ],
+        skills: ["React", "Node.js", "TypeScript", "AWS", "GraphQL", "PostgreSQL"],
+        expertise: ["Frontend Development", "Backend Development", "Cloud Architecture"],
+        previousCompanies: [
+          { name: "Meta", logo: "https://via.placeholder.com/50x50?text=M", position: "Senior Software Engineer", duration: "2021-2023" },
+          { name: "Google", logo: "https://via.placeholder.com/50x50?text=G", position: "Software Engineer", duration: "2019-2021" }
+        ],
+        education: [
+          { school: "Stanford University", degree: "MS Computer Science", year: "2019" }
+        ],
+        certifications: [
+          { name: "AWS Solutions Architect", issuer: "Amazon", year: "2022" }
+        ],
+        portfolio: [
+          { title: "E-commerce Platform", description: "Full-stack e-commerce solution", url: "https://github.com/sarah/ecommerce", image: "https://via.placeholder.com/300x200" }
+        ],
+        isVerified: true,
+        verificationLevel: "top3",
+        isAvailable: true,
+        profileStrength: 95,
+        totalEarnings: "125000.00",
+        jobsCompleted: 12,
+        averageRating: "4.9",
+        responseTime: "Usually responds within 1 hour",
+        joinedAt: new Date("2023-01-15"),
+        lastActive: new Date(),
+        isActive: true
+      },
+      {
+        id: 2,
+        email: "john.smith@email.com",
+        firstName: "John",
+        lastName: "Smith",
+        title: "Senior UX/UI Designer",
+        bio: "Award-winning designer with 10+ years creating beautiful, user-centered digital experiences. Former Apple designer.",
+        location: "New York, NY",
+        timezone: "EST",
+        avatar: "https://via.placeholder.com/150x150?text=JS",
+        hourlyRate: "85.00",
+        currency: "USD",
+        yearsOfExperience: 10,
+        languages: [
+          { lang: "English", level: "Native" },
+          { lang: "Spanish", level: "Conversational" }
+        ],
+        skills: ["Figma", "Adobe Creative Suite", "Prototyping", "User Research", "Design Systems"],
+        expertise: ["UI/UX Design", "Design Systems", "Mobile Design"],
+        previousCompanies: [
+          { name: "Apple", logo: "https://via.placeholder.com/50x50?text=A", position: "Senior Designer", duration: "2020-2023" },
+          { name: "Airbnb", logo: "https://via.placeholder.com/50x50?text=AB", position: "Product Designer", duration: "2018-2020" }
+        ],
+        education: [
+          { school: "RISD", degree: "BFA Graphic Design", year: "2014" }
+        ],
+        certifications: [],
+        portfolio: [
+          { title: "Mobile Banking App", description: "Complete UX/UI redesign", url: "https://dribbble.com/john", image: "https://via.placeholder.com/300x200" }
+        ],
+        isVerified: true,
+        verificationLevel: "expert",
+        isAvailable: true,
+        profileStrength: 92,
+        totalEarnings: "89000.00",
+        jobsCompleted: 18,
+        averageRating: "4.8",
+        responseTime: "Usually responds within 2 hours",
+        joinedAt: new Date("2023-03-20"),
+        lastActive: new Date(),
+        isActive: true
+      }
+    ];
+
+    talents.forEach(talent => {
+      this.talents.set(talent.id, talent);
+      this.currentTalentId = Math.max(this.currentTalentId, talent.id + 1);
+    });
+
+    // Seed Jobs
+    const jobs: Job[] = [
+      {
+        id: 1,
+        companyId: 1,
+        categoryId: 1,
+        title: "Senior React Developer for SaaS Platform",
+        description: "We're looking for an experienced React developer to help build our next-generation SaaS platform. You'll work with modern technologies including React 18, TypeScript, and GraphQL.",
+        requirements: ["5+ years React experience", "TypeScript proficiency", "GraphQL knowledge"],
+        skillsRequired: ["React", "TypeScript", "GraphQL", "Node.js"],
+        experienceLevel: "senior",
+        jobType: "full-time",
+        duration: "6+ months",
+        budget: "25000.00",
+        hourlyRateMin: "80.00",
+        hourlyRateMax: "120.00",
+        currency: "USD",
+        isRemote: true,
+        location: "Remote",
+        timezone: "EST",
+        isUrgent: false,
+        applicationDeadline: new Date("2025-08-01"),
+        status: "open",
+        postedAt: new Date(),
+        updatedAt: new Date(),
+        isActive: true
+      },
+      {
+        id: 2,
+        companyId: 2,
+        categoryId: 2,
+        title: "UX Designer for Mobile App Redesign",
+        description: "Join our team to redesign a popular mobile app used by millions. We need someone with strong UX skills and mobile design experience.",
+        requirements: ["3+ years mobile design", "User research experience", "Figma expertise"],
+        skillsRequired: ["Figma", "Mobile Design", "User Research", "Prototyping"],
+        experienceLevel: "mid",
+        jobType: "part-time",
+        duration: "3 months",
+        budget: "15000.00",
+        hourlyRateMin: "60.00",
+        hourlyRateMax: "90.00",
+        currency: "USD",
+        isRemote: true,
+        location: "Remote",
+        timezone: "EST",
+        isUrgent: true,
+        applicationDeadline: new Date("2025-07-15"),
+        status: "open",
+        postedAt: new Date(),
+        updatedAt: new Date(),
+        isActive: true
+      }
+    ];
+
+    jobs.forEach(job => {
+      this.jobs.set(job.id, job);
+      this.currentJobId = Math.max(this.currentJobId, job.id + 1);
+    });
   }
 
-  // User methods
-  async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
-  }
-
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(user => user.email === email);
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { 
-      ...insertUser, 
-      id,
-      createdAt: new Date()
-    };
-    this.users.set(id, user);
-    return user;
-  }
-
-  async updateUser(id: number, updateData: Partial<InsertUser>): Promise<User | undefined> {
-    const user = this.users.get(id);
-    if (!user) return undefined;
+  // Talent methods
+  async getAllTalents(filters?: any): Promise<Talent[]> {
+    let talents = Array.from(this.talents.values()).filter(t => t.isActive);
     
-    const updatedUser = { ...user, ...updateData };
-    this.users.set(id, updatedUser);
-    return updatedUser;
+    if (filters) {
+      if (filters.search) {
+        const searchLower = filters.search.toLowerCase();
+        talents = talents.filter(t => 
+          t.firstName.toLowerCase().includes(searchLower) ||
+          t.lastName.toLowerCase().includes(searchLower) ||
+          t.title.toLowerCase().includes(searchLower) ||
+          (t.skills && t.skills.some(skill => skill.toLowerCase().includes(searchLower)))
+        );
+      }
+      
+      if (filters.hourlyRateMin) {
+        talents = talents.filter(t => t.hourlyRate && parseFloat(t.hourlyRate) >= filters.hourlyRateMin);
+      }
+      
+      if (filters.hourlyRateMax) {
+        talents = talents.filter(t => t.hourlyRate && parseFloat(t.hourlyRate) <= filters.hourlyRateMax);
+      }
+      
+      if (filters.location) {
+        talents = talents.filter(t => t.location?.toLowerCase().includes(filters.location.toLowerCase()));
+      }
+      
+      if (filters.verificationLevel) {
+        talents = talents.filter(t => t.verificationLevel === filters.verificationLevel);
+      }
+      
+      if (filters.isAvailable !== undefined) {
+        talents = talents.filter(t => t.isAvailable === filters.isAvailable);
+      }
+    }
+    
+    return talents.sort((a, b) => parseFloat(b.averageRating || "0") - parseFloat(a.averageRating || "0"));
   }
 
-  // Job Category methods
-  async getAllJobCategories(): Promise<JobCategory[]> {
-    return Array.from(this.jobCategories.values());
+  async getTalent(id: number): Promise<Talent | undefined> {
+    return this.talents.get(id);
   }
 
-  async getJobCategory(id: number): Promise<JobCategory | undefined> {
-    return this.jobCategories.get(id);
+  async getTalentByEmail(email: string): Promise<Talent | undefined> {
+    return Array.from(this.talents.values()).find(t => t.email === email);
   }
 
-  async getJobCategoryBySlug(slug: string): Promise<JobCategory | undefined> {
-    return Array.from(this.jobCategories.values()).find(category => category.slug === slug);
+  async createTalent(insertTalent: InsertTalent): Promise<Talent> {
+    const id = this.currentTalentId++;
+    const talent: Talent = { 
+      ...insertTalent, 
+      id,
+      joinedAt: new Date(),
+      lastActive: new Date()
+    };
+    this.talents.set(id, talent);
+    return talent;
   }
 
-  async createJobCategory(insertCategory: InsertJobCategory): Promise<JobCategory> {
+  async updateTalent(id: number, updateData: Partial<InsertTalent>): Promise<Talent | undefined> {
+    const talent = this.talents.get(id);
+    if (!talent) return undefined;
+    
+    const updatedTalent = { ...talent, ...updateData };
+    this.talents.set(id, updatedTalent);
+    return updatedTalent;
+  }
+
+  // Talent Category methods
+  async getAllTalentCategories(): Promise<TalentCategory[]> {
+    return Array.from(this.talentCategories.values())
+      .filter(c => c.isActive)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  }
+
+  async getTalentCategory(id: number): Promise<TalentCategory | undefined> {
+    return this.talentCategories.get(id);
+  }
+
+  async getTalentCategoryBySlug(slug: string): Promise<TalentCategory | undefined> {
+    return Array.from(this.talentCategories.values()).find(c => c.slug === slug);
+  }
+
+  async createTalentCategory(insertCategory: InsertTalentCategory): Promise<TalentCategory> {
     const id = this.currentCategoryId++;
-    const category: JobCategory = { ...insertCategory, id };
-    this.jobCategories.set(id, category);
+    const category: TalentCategory = { ...insertCategory, id };
+    this.talentCategories.set(id, category);
     return category;
   }
 
-  // Job methods
-  async getAllJobs(filters?: {
-    categoryId?: number;
-    experienceLevel?: string;
-    jobType?: string;
-    salaryMin?: number;
-    salaryMax?: number;
-    search?: string;
-  }): Promise<Job[]> {
-    let jobs = Array.from(this.jobs.values()).filter(job => job.isActive);
+  // Company methods
+  async getAllCompanies(): Promise<Company[]> {
+    return Array.from(this.companies.values()).filter(c => c.isActive);
+  }
 
+  async getCompany(id: number): Promise<Company | undefined> {
+    return this.companies.get(id);
+  }
+
+  async getCompanyByEmail(email: string): Promise<Company | undefined> {
+    return Array.from(this.companies.values()).find(c => c.email === email);
+  }
+
+  async createCompany(insertCompany: InsertCompany): Promise<Company> {
+    const id = this.currentCompanyId++;
+    const company: Company = { 
+      ...insertCompany, 
+      id,
+      createdAt: new Date()
+    };
+    this.companies.set(id, company);
+    return company;
+  }
+
+  async updateCompany(id: number, updateData: Partial<InsertCompany>): Promise<Company | undefined> {
+    const company = this.companies.get(id);
+    if (!company) return undefined;
+    
+    const updatedCompany = { ...company, ...updateData };
+    this.companies.set(id, updatedCompany);
+    return updatedCompany;
+  }
+
+  // Job methods
+  async getAllJobs(filters?: any): Promise<Job[]> {
+    let jobs = Array.from(this.jobs.values()).filter(j => j.isActive);
+    
     if (filters) {
+      if (filters.companyId) {
+        jobs = jobs.filter(j => j.companyId === filters.companyId);
+      }
+      
       if (filters.categoryId) {
-        jobs = jobs.filter(job => job.categoryId === filters.categoryId);
+        jobs = jobs.filter(j => j.categoryId === filters.categoryId);
       }
-      if (filters.experienceLevel) {
-        jobs = jobs.filter(job => job.experienceLevel === filters.experienceLevel);
-      }
-      if (filters.jobType) {
-        jobs = jobs.filter(job => job.jobType === filters.jobType);
-      }
-      if (filters.salaryMin) {
-        jobs = jobs.filter(job => job.salaryMin && job.salaryMin >= filters.salaryMin!);
-      }
-      if (filters.salaryMax) {
-        jobs = jobs.filter(job => job.salaryMax && job.salaryMax <= filters.salaryMax!);
-      }
+      
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
-        jobs = jobs.filter(job => 
-          job.title.toLowerCase().includes(searchLower) ||
-          job.company.toLowerCase().includes(searchLower) ||
-          job.description.toLowerCase().includes(searchLower) ||
-          job.skills?.some(skill => skill.toLowerCase().includes(searchLower))
+        jobs = jobs.filter(j => 
+          j.title.toLowerCase().includes(searchLower) ||
+          j.description.toLowerCase().includes(searchLower) ||
+          j.skillsRequired.some(skill => skill.toLowerCase().includes(searchLower))
         );
       }
     }
-
-    return jobs.sort((a, b) => new Date(b.postedAt!).getTime() - new Date(a.postedAt!).getTime());
+    
+    return jobs.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime());
   }
 
   async getJob(id: number): Promise<Job | undefined> {
     return this.jobs.get(id);
-  }
-
-  async getJobsByCategory(categoryId: number): Promise<Job[]> {
-    return Array.from(this.jobs.values()).filter(job => job.categoryId === categoryId && job.isActive);
   }
 
   async createJob(insertJob: InsertJob): Promise<Job> {
@@ -278,7 +552,8 @@ export class MemStorage implements IStorage {
     const job: Job = { 
       ...insertJob, 
       id,
-      postedAt: new Date()
+      postedAt: new Date(),
+      updatedAt: new Date()
     };
     this.jobs.set(id, job);
     return job;
@@ -288,35 +563,96 @@ export class MemStorage implements IStorage {
     const job = this.jobs.get(id);
     if (!job) return undefined;
     
-    const updatedJob = { ...job, ...updateData };
+    const updatedJob = { ...job, ...updateData, updatedAt: new Date() };
     this.jobs.set(id, updatedJob);
     return updatedJob;
   }
 
-  // Job Application methods
-  async getJobApplicationsByUser(userId: number): Promise<JobApplication[]> {
-    return Array.from(this.jobApplications.values()).filter(app => app.userId === userId);
+  // Proposal methods
+  async getProposalsByJob(jobId: number): Promise<Proposal[]> {
+    return Array.from(this.proposals.values()).filter(p => p.jobId === jobId);
   }
 
-  async getJobApplicationsByJob(jobId: number): Promise<JobApplication[]> {
-    return Array.from(this.jobApplications.values()).filter(app => app.jobId === jobId);
+  async getProposalsByTalent(talentId: number): Promise<Proposal[]> {
+    return Array.from(this.proposals.values()).filter(p => p.talentId === talentId);
   }
 
-  async createJobApplication(insertApplication: InsertJobApplication): Promise<JobApplication> {
-    const id = this.currentApplicationId++;
-    const application: JobApplication = { 
-      ...insertApplication, 
+  async getProposal(id: number): Promise<Proposal | undefined> {
+    return this.proposals.get(id);
+  }
+
+  async createProposal(insertProposal: InsertProposal): Promise<Proposal> {
+    const id = this.currentProposalId++;
+    const proposal: Proposal = { 
+      ...insertProposal, 
       id,
-      appliedAt: new Date()
+      submittedAt: new Date(),
+      updatedAt: new Date()
     };
-    this.jobApplications.set(id, application);
-    return application;
+    this.proposals.set(id, proposal);
+    return proposal;
   }
 
-  async getJobApplication(jobId: number, userId: number): Promise<JobApplication | undefined> {
-    return Array.from(this.jobApplications.values()).find(app => 
-      app.jobId === jobId && app.userId === userId
-    );
+  async updateProposal(id: number, updateData: Partial<InsertProposal>): Promise<Proposal | undefined> {
+    const proposal = this.proposals.get(id);
+    if (!proposal) return undefined;
+    
+    const updatedProposal = { ...proposal, ...updateData, updatedAt: new Date() };
+    this.proposals.set(id, updatedProposal);
+    return updatedProposal;
+  }
+
+  // Contract methods
+  async getContractsByCompany(companyId: number): Promise<Contract[]> {
+    return Array.from(this.contracts.values()).filter(c => c.companyId === companyId);
+  }
+
+  async getContractsByTalent(talentId: number): Promise<Contract[]> {
+    return Array.from(this.contracts.values()).filter(c => c.talentId === talentId);
+  }
+
+  async getContract(id: number): Promise<Contract | undefined> {
+    return this.contracts.get(id);
+  }
+
+  async createContract(insertContract: InsertContract): Promise<Contract> {
+    const id = this.currentContractId++;
+    const contract: Contract = { 
+      ...insertContract, 
+      id,
+      createdAt: new Date()
+    };
+    this.contracts.set(id, contract);
+    return contract;
+  }
+
+  async updateContract(id: number, updateData: Partial<InsertContract>): Promise<Contract | undefined> {
+    const contract = this.contracts.get(id);
+    if (!contract) return undefined;
+    
+    const updatedContract = { ...contract, ...updateData };
+    this.contracts.set(id, updatedContract);
+    return updatedContract;
+  }
+
+  // Review methods
+  async getReviewsByTalent(talentId: number): Promise<Review[]> {
+    return Array.from(this.reviews.values()).filter(r => r.revieweeId === talentId && r.reviewerType === "company");
+  }
+
+  async getReviewsByCompany(companyId: number): Promise<Review[]> {
+    return Array.from(this.reviews.values()).filter(r => r.revieweeId === companyId && r.reviewerType === "talent");
+  }
+
+  async createReview(insertReview: InsertReview): Promise<Review> {
+    const id = this.currentReviewId++;
+    const review: Review = { 
+      ...insertReview, 
+      id,
+      createdAt: new Date()
+    };
+    this.reviews.set(id, review);
+    return review;
   }
 }
 

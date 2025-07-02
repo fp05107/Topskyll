@@ -108,15 +108,17 @@ The application uses a PostgreSQL database with the following main entities:
 
 ## Recent Changes
 ```
+- July 02, 2025: Complete transformation to Toptal-style talent marketplace
+  • Completely redesigned database schema for talent marketplace platform
+  • Created comprehensive talent profiles with verification levels and portfolios
+  • Built responsive Toptal-style navigation with mega menu and mobile support
+  • Developed new homepage with hero section, talent categories, and featured professionals
+  • Added talent categories: Developers, Designers, Finance Experts, Project/Product Managers, Marketing
+  • Implemented proper company and proposal management system
+  • Added contract and review systems for talent marketplace
+  • Created new API structure for talent-focused endpoints
+  • Enhanced UI with modern Toptal-inspired design and branding
 - July 01, 2025: Enhanced Jobs page with category tabs and multi-currency support
-  • Added popular category tabs (Frontend, Backend, Full Stack, AI/ML, Cloud, Mobile)
-  • Implemented enhanced search with filters and active filter display
-  • Restructured backend with proper folder organization (controllers, models, routes)
-  • Added multi-currency salary support (USD, EUR, GBP, INR, CAD, AUD, SGD)
-  • Enhanced job cards with better salary formatting and currency display
-  • Fixed Select component errors and improved navigation
-  • Converted all frontend components from TypeScript to JavaScript
-  • Created proper backend API structure for scalable currency handling
 - July 01, 2025: Initial setup with basic job portal functionality
 ```
 
