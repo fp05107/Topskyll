@@ -10,11 +10,11 @@ export default function Navbar() {
 
   const navItems = [
     { href: "/", label: "Home" },
-    { href: "/jobs", label: "Jobs" },
-    { href: "/about", label: "About" },
-    { href: "/how-it-works", label: "How It Works" },
-    { href: "/top-3-percent", label: "Top 3%" },
-    { href: "/companies", label: "For Companies" },
+    { href: "/developers", label: "Developers" },
+    { href: "/designers", label: "Designers" },
+    { href: "/finance", label: "Finance" },
+    { href: "/projects", label: "Projects" },
+    { href: "/companies", label: "Companies" },
   ];
 
   return (
@@ -26,9 +26,14 @@ export default function Navbar() {
             <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">T</span>
             </div>
-            <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
-              TopSkyll
-            </span>
+            <div>
+              <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
+                TopSkyll
+              </span>
+              <div className="text-xs font-medium text-blue-600 dark:text-blue-400 leading-none">
+                Top 3% Talent
+              </div>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}

@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "name": "JavaScript",
+    "category": "Programming Languages",
+    "talentCount": 3247,
+    "averageRate": 45,
+    "description": "The programming language of the web, used for front-end and back-end development",
+    "relatedSkills": ["React", "Node.js", "Vue.js", "Angular", "TypeScript"]
+  },
+  {
+    "id": 2,
+    "name": "Python",
+    "category": "Programming Languages", 
+    "talentCount": 2891,
+    "averageRate": 52,
+    "description": "Versatile programming language for web development, data science, and AI/ML",
+    "relatedSkills": ["Django", "Flask", "FastAPI", "TensorFlow", "PyTorch"]
+  },
+  {
+    "id": 3,
+    "name": "React",
+    "category": "Frontend Frameworks",
+    "talentCount": 2234,
+    "averageRate": 48,
+    "description": "Popular JavaScript library for building user interfaces",
+    "relatedSkills": ["JavaScript", "TypeScript", "Redux", "Next.js", "React Native"]
+  },
+  {
+    "id": 4,
+    "name": "Node.js",
+    "category": "Backend Technologies",
+    "talentCount": 1987,
+    "averageRate": 46,
+    "description": "JavaScript runtime for building scalable server-side applications",
+    "relatedSkills": ["Express.js", "MongoDB", "PostgreSQL", "GraphQL", "TypeScript"]
+  },
+  {
+    "id": 5,
+    "name": "AWS",
+    "category": "Cloud Platforms",
+    "talentCount": 1756,
+    "averageRate": 58,
+    "description": "Amazon Web Services cloud computing platform",
+    "relatedSkills": ["Docker", "Kubernetes", "Terraform", "Lambda", "EC2"]
+  },
+  {
+    "id": 6,
+    "name": "React Native",
+    "category": "Mobile Development",
+    "talentCount": 1234,
+    "averageRate": 44,
+    "description": "Framework for building native mobile apps using React",
+    "relatedSkills": ["JavaScript", "React", "TypeScript", "Redux", "Firebase"]
+  },
+  {
+    "id": 7,
+    "name": "Flutter",
+    "category": "Mobile Development",
+    "talentCount": 987,
+    "averageRate": 42,
+    "description": "Google's UI toolkit for building natively compiled applications",
+    "relatedSkills": ["Dart", "Firebase", "Android", "iOS", "Material Design"]
+  },
+  {
+    "id": 8,
+    "name": "Machine Learning",
+    "category": "AI/ML",
+    "talentCount": 1456,
+    "averageRate": 65,
+    "description": "Technology that enables computers to learn from data",
+    "relatedSkills": ["Python", "TensorFlow", "PyTorch", "Scikit-learn", "Pandas"]
+  },
+  {
+    "id": 9,
+    "name": "Docker",
+    "category": "DevOps",
+    "talentCount": 1567,
+    "averageRate": 52,
+    "description": "Platform for developing, shipping, and running applications in containers",
+    "relatedSkills": ["Kubernetes", "AWS", "Linux", "CI/CD", "Terraform"]
+  },
+  {
+    "id": 10,
+    "name": "Figma",
+    "category": "Design Tools",
+    "talentCount": 892,
+    "averageRate": 38,
+    "description": "Collaborative interface design tool",
+    "relatedSkills": ["UI/UX", "Prototyping", "Design Systems", "Adobe XD", "Sketch"]
+  }
+]

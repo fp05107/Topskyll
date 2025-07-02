@@ -1,0 +1,144 @@
+[
+  {
+    "id": 1,
+    "name": "Software Developers",
+    "slug": "software-developers",
+    "description": "Top software developers specializing in web and application development",
+    "icon": "Code",
+    "totalTalents": 2847,
+    "averageRate": 48,
+    "topSkills": ["JavaScript", "Python", "React", "Node.js", "Java"],
+    "subcategories": [
+      "Full-Stack Developers",
+      "Front-End Developers", 
+      "Back-End Developers",
+      "JavaScript Developers",
+      "Python Developers",
+      "Java Developers",
+      "C++ Developers",
+      "React Developers",
+      "Node.js Developers",
+      "Angular Developers"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "AI/ML Engineers",
+    "slug": "ai-ml-engineers", 
+    "description": "Expert AI and machine learning engineers building intelligent systems",
+    "icon": "Brain",
+    "totalTalents": 1234,
+    "averageRate": 65,
+    "topSkills": ["Python", "TensorFlow", "PyTorch", "Machine Learning", "Deep Learning"],
+    "subcategories": [
+      "Machine Learning Engineers",
+      "Data Scientists",
+      "Computer Vision Engineers",
+      "NLP Engineers",
+      "AI Researchers",
+      "MLOps Engineers"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "DevOps Engineers",
+    "slug": "devops-engineers",
+    "description": "Senior DevOps engineers specializing in cloud infrastructure and automation",
+    "icon": "Settings",
+    "totalTalents": 892,
+    "averageRate": 58,
+    "topSkills": ["AWS", "Docker", "Kubernetes", "Terraform", "CI/CD"],
+    "subcategories": [
+      "Cloud Architects",
+      "Site Reliability Engineers",
+      "Platform Engineers",
+      "Infrastructure Engineers",
+      "Automation Engineers"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Mobile Developers",
+    "slug": "mobile-developers",
+    "description": "Expert mobile developers for iOS, Android, and cross-platform apps",
+    "icon": "Smartphone",
+    "totalTalents": 1567,
+    "averageRate": 45,
+    "topSkills": ["React Native", "Flutter", "iOS", "Android", "Swift"],
+    "subcategories": [
+      "iOS Developers",
+      "Android Developers",
+      "React Native Developers",
+      "Flutter Developers",
+      "Xamarin Developers"
+    ]
+  },
+  {
+    "id": 5,
+    "name": "UI/UX Designers",
+    "slug": "ui-ux-designers",
+    "description": "Top-tier designers creating exceptional user experiences",
+    "icon": "Paintbrush",
+    "totalTalents": 734,
+    "averageRate": 42,
+    "topSkills": ["Figma", "Adobe XD", "Sketch", "Prototyping", "User Research"],
+    "subcategories": [
+      "Product Designers",
+      "Visual Designers",
+      "Interaction Designers",
+      "UX Researchers",
+      "Design System Architects"
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Blockchain Developers",
+    "slug": "blockchain-developers",
+    "description": "Expert blockchain developers building decentralized applications",
+    "icon": "Link",
+    "totalTalents": 456,
+    "averageRate": 72,
+    "topSkills": ["Solidity", "Ethereum", "Web3.js", "Smart Contracts", "DeFi"],
+    "subcategories": [
+      "Smart Contract Developers",
+      "DeFi Developers",
+      "NFT Developers",
+      "Web3 Developers",
+      "Cryptocurrency Developers"
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Data Scientists",
+    "slug": "data-scientists",
+    "description": "Senior data scientists turning data into actionable insights",
+    "icon": "BarChart",
+    "totalTalents": 983,
+    "averageRate": 55,
+    "topSkills": ["Python", "R", "SQL", "Machine Learning", "Statistics"],
+    "subcategories": [
+      "Data Analysts",
+      "Business Intelligence Analysts",
+      "Data Engineers",
+      "Statisticians",
+      "Research Scientists"
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Cybersecurity Experts",
+    "slug": "cybersecurity-experts",
+    "description": "Top cybersecurity professionals protecting digital assets",
+    "icon": "Shield",
+    "totalTalents": 567,
+    "averageRate": 68,
+    "topSkills": ["Penetration Testing", "Ethical Hacking", "Network Security", "CISSP", "Vulnerability Assessment"],
+    "subcategories": [
+      "Penetration Testers",
+      "Security Analysts",
+      "Incident Response Specialists",
+      "Compliance Experts",
+      "Security Architects"
+    ]
+  }
+]

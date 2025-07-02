@@ -2,14 +2,15 @@ import { Express, Request, Response } from "express";
 import { Server } from "http";
 import { createServer } from "http";
 import { storage } from "./storage";
+import { TALENT_DATA, CATEGORY_DATA } from "./storage-simple";
 import { insertTalentSchema, insertCompanySchema, insertJobSchema, insertProposalSchema } from "../shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Talent Categories
   app.get("/api/talent-categories", async (req: Request, res: Response) => {
     try {
-      const categories = await storage.getAllTalentCategories();
-      res.json(categories);
+      // Return enhanced Toptal-style categories with rich data
+      res.json(CATEGORY_DATA);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch talent categories" });
     }
@@ -31,19 +32,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Talents
   app.get("/api/talents", async (req: Request, res: Response) => {
     try {
-      const filters = {
-        category: req.query.category as string,
-        experienceLevel: req.query.experienceLevel as string,
-        hourlyRateMin: req.query.hourlyRateMin ? parseInt(req.query.hourlyRateMin as string) : undefined,
-        hourlyRateMax: req.query.hourlyRateMax ? parseInt(req.query.hourlyRateMax as string) : undefined,
-        location: req.query.location as string,
-        skills: req.query.skills ? (req.query.skills as string).split(',') : undefined,
-        isAvailable: req.query.isAvailable ? req.query.isAvailable === 'true' : undefined,
-        verificationLevel: req.query.verificationLevel as string,
-        search: req.query.search as string,
-      };
-
-      const talents = await storage.getAllTalents(filters);
+      // Return enhanced Toptal-style talent data
+      let talents = [...TALENT_DATA];
+      
+      // Apply simple filtering
+      if (req.query.category) {
+        const category = req.query.category as string;
+        talents = talents.filter(talent => 
+          talent.categories.some(cat => cat.toLowerCase().includes(category.toLowerCase()))
+        );
+      }
+      
+      if (req.query.search) {
+        const search = (req.query.search as string).toLowerCase();
+        talents = talents.filter(talent => 
+          talent.name.toLowerCase().includes(search) ||
+          talent.title.toLowerCase().includes(search) ||
+          talent.skills.some(skill => skill.toLowerCase().includes(search))
+        );
+      }
+      
       res.json(talents);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch talents" });
@@ -53,7 +61,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/talents/:id", async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
-      const talent = await storage.getTalent(id);
+      const talent = TALENT_DATA.find(t => t.id === id);
       if (!talent) {
         return res.status(404).json({ error: "Talent not found" });
       }

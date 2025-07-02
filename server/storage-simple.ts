@@ -1,0 +1,178 @@
+// Enhanced storage with Toptal-style data
+const TALENT_DATA = [
+  {
+    id: 1,
+    name: "Priya Sharma",
+    title: "Senior Full-Stack Developer",
+    location: "Bangalore, India",
+    timezone: "UTC+05:30",
+    hourlyRate: 45,
+    currency: "USD",
+    rating: 4.9,
+    totalReviews: 47,
+    verificationLevel: "Verified Expert",
+    isTopTalent: true,
+    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b577?w=400&h=400&fit=crop&crop=face",
+    skills: ["React", "Node.js", "TypeScript", "MongoDB", "AWS", "Docker", "GraphQL"],
+    categories: ["Software Developers", "Full-Stack Developers"],
+    experience: "8+ years",
+    languages: ["English", "Hindi"],
+    availability: "Available Now",
+    description: "Senior full-stack developer with 8+ years of experience building scalable web applications. Specialized in React, Node.js, and cloud architecture. Previously worked at leading Indian startups and multinational companies.",
+    toptalMemberSince: "March 15, 2022",
+    completedProjects: 34,
+    clientRetentionRate: 95,
+    responseTime: "Within 1 hour"
+  },
+  {
+    id: 2,
+    name: "Arjun Patel",
+    title: "AI/ML Engineer",
+    location: "Mumbai, India",
+    timezone: "UTC+05:30",
+    hourlyRate: 55,
+    currency: "USD",
+    rating: 4.8,
+    totalReviews: 32,
+    verificationLevel: "Verified Expert",
+    isTopTalent: true,
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+    skills: ["Python", "TensorFlow", "PyTorch", "Machine Learning", "Deep Learning", "Computer Vision", "NLP"],
+    categories: ["AI/ML Engineers", "Data Scientists"],
+    experience: "6+ years",
+    languages: ["English", "Hindi", "Gujarati"],
+    availability: "Available Now",
+    description: "Expert AI/ML engineer with extensive experience in computer vision and natural language processing. Built production ML systems serving millions of users. Ph.D. in Computer Science from IIT Mumbai.",
+    toptalMemberSince: "August 7, 2021",
+    completedProjects: 28,
+    clientRetentionRate: 92,
+    responseTime: "Within 2 hours"
+  },
+  {
+    id: 3,
+    name: "Sneha Reddy",
+    title: "DevOps Architect",
+    location: "Hyderabad, India",
+    timezone: "UTC+05:30",
+    hourlyRate: 50,
+    currency: "USD",
+    rating: 4.9,
+    totalReviews: 41,
+    verificationLevel: "Verified Expert",
+    isTopTalent: true,
+    avatar: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=400&h=400&fit=crop&crop=face",
+    skills: ["AWS", "Kubernetes", "Docker", "Terraform", "CI/CD", "Jenkins", "Monitoring"],
+    categories: ["DevOps Engineers", "Cloud Architects"],
+    experience: "7+ years",
+    languages: ["English", "Telugu", "Hindi"],
+    availability: "Available Now",
+    description: "Senior DevOps architect specializing in cloud infrastructure and automation. Built and maintained large-scale systems for fintech and e-commerce companies. AWS Certified Solutions Architect.",
+    toptalMemberSince: "January 12, 2020",
+    completedProjects: 39,
+    clientRetentionRate: 97,
+    responseTime: "Within 1 hour"
+  },
+  {
+    id: 4,
+    name: "Rohit Kumar",
+    title: "Mobile App Developer",
+    location: "Delhi, India",
+    timezone: "UTC+05:30",
+    hourlyRate: 40,
+    currency: "USD",
+    rating: 4.7,
+    totalReviews: 25,
+    verificationLevel: "Verified Expert",
+    isTopTalent: true,
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+    skills: ["React Native", "Flutter", "iOS", "Android", "Firebase", "Redux", "TypeScript"],
+    categories: ["Mobile Developers", "React Native Developers"],
+    experience: "5+ years",
+    languages: ["English", "Hindi"],
+    availability: "Available Now",
+    description: "Expert mobile developer with proven track record in building cross-platform applications. Published 15+ apps on App Store and Play Store with over 1M downloads combined.",
+    toptalMemberSince: "November 3, 2022",
+    completedProjects: 22,
+    clientRetentionRate: 90,
+    responseTime: "Within 3 hours"
+  }
+];
+
+const CATEGORY_DATA = [
+  {
+    id: 1,
+    name: "Software Developers",
+    slug: "software-developers",
+    description: "Top software developers specializing in web and application development",
+    icon: "Code",
+    totalTalents: 2847,
+    averageRate: 48,
+    topSkills: ["JavaScript", "Python", "React", "Node.js", "Java"],
+    subcategories: [
+      "Full-Stack Developers",
+      "Front-End Developers", 
+      "Back-End Developers",
+      "JavaScript Developers",
+      "Python Developers",
+      "Java Developers",
+      "C++ Developers",
+      "React Developers",
+      "Node.js Developers",
+      "Angular Developers"
+    ]
+  },
+  {
+    id: 2,
+    name: "AI/ML Engineers",
+    slug: "ai-ml-engineers", 
+    description: "Expert AI and machine learning engineers building intelligent systems",
+    icon: "Brain",
+    totalTalents: 1234,
+    averageRate: 65,
+    topSkills: ["Python", "TensorFlow", "PyTorch", "Machine Learning", "Deep Learning"],
+    subcategories: [
+      "Machine Learning Engineers",
+      "Data Scientists",
+      "Computer Vision Engineers",
+      "NLP Engineers",
+      "AI Researchers",
+      "MLOps Engineers"
+    ]
+  },
+  {
+    id: 3,
+    name: "DevOps Engineers",
+    slug: "devops-engineers",
+    description: "Senior DevOps engineers specializing in cloud infrastructure and automation",
+    icon: "Settings",
+    totalTalents: 892,
+    averageRate: 58,
+    topSkills: ["AWS", "Docker", "Kubernetes", "Terraform", "CI/CD"],
+    subcategories: [
+      "Cloud Architects",
+      "Site Reliability Engineers",
+      "Platform Engineers",
+      "Infrastructure Engineers",
+      "Automation Engineers"
+    ]
+  },
+  {
+    id: 4,
+    name: "Mobile Developers",
+    slug: "mobile-developers",
+    description: "Expert mobile developers for iOS, Android, and cross-platform apps",
+    icon: "Smartphone",
+    totalTalents: 1567,
+    averageRate: 45,
+    topSkills: ["React Native", "Flutter", "iOS", "Android", "Swift"],
+    subcategories: [
+      "iOS Developers",
+      "Android Developers",
+      "React Native Developers",
+      "Flutter Developers",
+      "Xamarin Developers"
+    ]
+  }
+];
+
+export { TALENT_DATA, CATEGORY_DATA };
