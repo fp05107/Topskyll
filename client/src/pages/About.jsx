@@ -1,247 +1,239 @@
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
 
 export default function About() {
   const teamMembers = [
     {
-      id: 1,
-      name: "Arjun Sharma",
-      role: "Founder & CEO",
-      description: "Former tech lead with 10+ years experience in remote hiring",
-      avatar: "AS",
-      linkedin: "#"
+      name: "Priya Sharma",
+      role: "CEO & Co-Founder",
+      image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face",
+      bio: "Former engineering leader at Google. Passionate about connecting Indian talent with global opportunities."
     },
     {
-      id: 2,
-      name: "Priya Patel",
-      role: "Head of Product",
-      description: "Product expert focused on creating seamless user experiences",
-      avatar: "PP",
-      linkedin: "#"
+      name: "Arjun Patel",
+      role: "CTO & Co-Founder", 
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+      bio: "Ex-Microsoft architect. Building technology to democratize remote work for Indian professionals."
     },
     {
-      id: 3,
-      name: "Rahul Kumar",
-      role: "Tech Lead",
-      description: "Full-stack developer passionate about scalable solutions",
-      avatar: "RK",
-      linkedin: "#"
-    },
-    {
-      id: 4,
-      name: "Anjali Singh",
-      role: "Head of Partnerships",
-      description: "Building relationships with top companies for remote opportunities",
-      avatar: "AS",
-      linkedin: "#"
+      name: "Sneha Gupta",
+      role: "Head of Talent",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face", 
+      bio: "Former HR director at Flipkart. Expert in identifying and nurturing top-tier technical talent."
     }
   ];
 
   const stats = [
-    { label: "Active Job Seekers", value: "50,000+", icon: "fas fa-users" },
-    { label: "Partner Companies", value: "800+", icon: "fas fa-building" },
-    { label: "Successful Placements", value: "15,000+", icon: "fas fa-handshake" },
-    { label: "Cities Covered", value: "100+", icon: "fas fa-map-marker-alt" }
-  ];
-
-  const values = [
-    {
-      title: "Remote-First Culture",
-      description: "We believe in the power of remote work to unlock global opportunities for Indian talent",
-      icon: "fas fa-globe-americas",
-      color: "from-blue-500 to-cyan-500"
-    },
-    {
-      title: "Quality Over Quantity",
-      description: "We carefully curate opportunities to ensure the best match between candidates and companies",
-      icon: "fas fa-star",
-      color: "from-yellow-500 to-orange-500"
-    },
-    {
-      title: "Transparency",
-      description: "Clear communication about salary, benefits, and expectations from day one",
-      icon: "fas fa-eye",
-      color: "from-green-500 to-emerald-500"
-    },
-    {
-      title: "Continuous Growth",
-      description: "Supporting career development through resources, mentorship, and skill-building",
-      icon: "fas fa-chart-line",
-      color: "from-purple-500 to-pink-500"
-    }
+    { label: "Professionals Placed", value: "10,000+", icon: "fas fa-users" },
+    { label: "Partner Companies", value: "500+", icon: "fas fa-building" },
+    { label: "Countries Served", value: "50+", icon: "fas fa-globe" },
+    { label: "Success Rate", value: "95%", icon: "fas fa-chart-line" }
   ];
 
   return (
-    <div className="min-h-screen pt-20 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-6">
-            About Topskyll
+    <div className="min-h-screen pt-20">
+      {/* Hero Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-5xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+            About TopSkyll
           </h1>
-          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto leading-relaxed">
-            We're on a mission to connect talented professionals in India with amazing remote opportunities 
-            from companies around the world. Founded in 2024, Topskyll has become India's leading platform 
-            for remote tech jobs.
+          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-8">
+            We're on a mission to connect India's brightest minds with the world's most innovative companies, 
+            creating opportunities that transcend geographical boundaries.
           </p>
+          <div className="flex justify-center space-x-4">
+            <Link href="/apply">
+              <Button size="lg" className="px-8">
+                Join Our Network
+              </Button>
+            </Link>
+            <Link href="/hire">
+              <Button variant="outline" size="lg" className="px-8">
+                Hire Talent
+              </Button>
+            </Link>
+          </div>
         </div>
+      </section>
 
-        {/* Mission & Vision */}
-        <section className="mb-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card className="border border-slate-200 dark:border-slate-700">
-              <CardContent className="p-8">
-                <div className="w-16 h-16 bg-gradient-to-r from-primary to-purple-600 rounded-xl flex items-center justify-center mb-6">
-                  <i className="fas fa-bullseye text-white text-2xl"></i>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-                  Our Mission
-                </h3>
-                <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
-                  To democratize access to global remote opportunities, enabling Indian professionals 
-                  to work with top companies worldwide while contributing to India's growing tech ecosystem.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border border-slate-200 dark:border-slate-700">
-              <CardContent className="p-8">
-                <div className="w-16 h-16 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mb-6">
-                  <i className="fas fa-eye text-white text-2xl"></i>
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-                  Our Vision
-                </h3>
-                <p className="text-slate-600 dark:text-slate-400 text-lg leading-relaxed">
-                  To become the world's most trusted platform for remote work, where geography is no 
-                  barrier to talent and opportunity, fostering a truly global workforce.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        {/* Stats */}
-        <section className="mb-16">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Stats Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <Card key={index} className="text-center border border-slate-200 dark:border-slate-700">
-                <CardContent className="p-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-primary to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i className={`${stat.icon} text-white`}></i>
-                  </div>
-                  <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
-                    {stat.value}
-                  </div>
-                  <div className="text-slate-600 dark:text-slate-400">
-                    {stat.label}
-                  </div>
-                </CardContent>
-              </Card>
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i className={`${stat.icon} text-2xl text-primary`}></i>
+                </div>
+                <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                  {stat.value}
+                </div>
+                <div className="text-slate-600 dark:text-slate-400">
+                  {stat.label}
+                </div>
+              </div>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Values */}
-        <section className="mb-16">
+      {/* Story Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-800/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+                Our Story
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-400 mb-6">
+                Founded in 2020 by engineers who experienced the challenges of finding quality remote work opportunities, 
+                TopSkyll was born from a simple observation: India has incredible technical talent, but limited access 
+                to global opportunities.
+              </p>
+              <p className="text-lg text-slate-600 dark:text-slate-400 mb-6">
+                We started with a vision to bridge this gap by creating a platform that not only connects talent with 
+                opportunities but ensures both parties find the perfect match through our rigorous screening process.
+              </p>
+              <p className="text-lg text-slate-600 dark:text-slate-400">
+                Today, we're proud to have helped thousands of Indian professionals build successful remote careers 
+                while helping companies worldwide access the best talent India has to offer.
+              </p>
+            </div>
+            <div className="relative">
+              <img 
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=400&fit=crop" 
+                alt="Team collaboration"
+                className="rounded-lg shadow-lg"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-600/20 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mission & Values */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-              Our Values
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+              Our Mission & Values
             </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              The principles that guide everything we do at Topskyll
-            </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {values.map((value, index) => (
-              <Card key={index} className="border border-slate-200 dark:border-slate-700">
-                <CardContent className="p-6">
-                  <div className={`w-12 h-12 bg-gradient-to-r ${value.color} rounded-xl flex items-center justify-center mb-4`}>
-                    <i className={`${value.icon} text-white`}></i>
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3">
-                    {value.title}
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-400">
-                    {value.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i className="fas fa-globe text-2xl text-blue-600"></i>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3">
+                  Global Access
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400">
+                  Breaking down geographical barriers to give Indian talent access to the world's best opportunities.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i className="fas fa-medal text-2xl text-green-600"></i>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3">
+                  Excellence
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400">
+                  Maintaining the highest standards through our rigorous screening and continuous learning programs.
+                </p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6 text-center">
+                <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <i className="fas fa-handshake text-2xl text-purple-600"></i>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3">
+                  Trust
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400">
+                  Building lasting relationships based on transparency, reliability, and mutual success.
+                </p>
+              </CardContent>
+            </Card>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Team */}
-        <section className="mb-16">
+      {/* Team Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-800/50">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-6">
               Meet Our Team
             </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              The passionate individuals working to revolutionize remote work in India
+            <p className="text-xl text-slate-600 dark:text-slate-400">
+              The passionate individuals working to transform remote work for India
             </p>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {teamMembers.map((member) => (
-              <Card key={member.id} className="text-center border border-slate-200 dark:border-slate-700">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {teamMembers.map((member, index) => (
+              <Card key={index} className="overflow-hidden">
+                <div className="aspect-square overflow-hidden">
+                  <img 
+                    src={member.image} 
+                    alt={member.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
                 <CardContent className="p-6">
-                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-white font-bold text-xl">{member.avatar}</span>
-                  </div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">
+                  <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-1">
                     {member.name}
                   </h3>
                   <p className="text-primary font-medium mb-3">
                     {member.role}
                   </p>
-                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
-                    {member.description}
+                  <p className="text-slate-600 dark:text-slate-400">
+                    {member.bio}
                   </p>
-                  <Button variant="outline" size="sm">
-                    <i className="fab fa-linkedin mr-2"></i>
-                    Connect
-                  </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Contact CTA */}
-        <section className="bg-gradient-to-r from-primary via-purple-600 to-pink-600 rounded-3xl p-12 text-white text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Ready to Join the Remote Revolution?
+      {/* CTA Section */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+            Ready to Join Our Mission?
           </h2>
-          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Whether you're a job seeker looking for remote opportunities or a company 
-            wanting to hire top Indian talent, we'd love to hear from you.
+          <p className="text-xl text-slate-600 dark:text-slate-400 mb-8">
+            Whether you're a talented professional looking for opportunities or a company seeking exceptional talent, 
+            we're here to help you succeed.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/signup">
-              <Button className="px-8 py-3 bg-white text-primary rounded-full font-semibold hover:bg-slate-100">
-                <i className="fas fa-user-plus mr-2"></i>
-                Join as Job Seeker
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/apply">
+              <Button size="lg" className="px-8">
+                Apply as Talent
               </Button>
             </Link>
-            <Button variant="outline" className="px-8 py-3 border-2 border-white text-white rounded-full font-semibold hover:bg-white hover:text-primary">
-              <i className="fas fa-building mr-2"></i>
-              Partner with Us
-            </Button>
+            <Link href="/hire">
+              <Button variant="outline" size="lg" className="px-8">
+                Hire Talent
+              </Button>
+            </Link>
+            <Link href="/contact">
+              <Button variant="ghost" size="lg" className="px-8">
+                Contact Us
+              </Button>
+            </Link>
           </div>
-          
-          <div className="mt-8 pt-8 border-t border-white/20">
-            <p className="text-white/80 mb-4">Get in touch</p>
-            <div className="flex items-center justify-center space-x-6 text-sm">
-              <span>📧 hello@topskyll.com</span>
-              <span>📞 +91-9999-TOPSKYLL</span>
-              <span>📍 Bangalore, India</span>
-            </div>
-          </div>
-        </section>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }
