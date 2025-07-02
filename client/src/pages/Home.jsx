@@ -1,239 +1,459 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { CategoryCard } from "@/components/CategoryCard.jsx";
-import { JobCard } from "@/components/JobCard.jsx";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
-export default function Home() {
-  const { data: categories = [] } = useQuery({
-    queryKey: ['/api/job-categories'],
-  });
+// Sample user profiles data
+const sampleProfiles = [
+  {
+    id: 1,
+    name: "Rajesh Kumar",
+    title: "Senior Full Stack Developer",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+    location: "Mumbai, India",
+    hourlyRate: "$45/hr",
+    rating: 4.9,
+    totalReviews: 127,
+    skills: ["React", "Node.js", "MongoDB", "AWS"],
+    bio: "8+ years building scalable web applications for global clients. Specialized in e-commerce and fintech solutions.",
+    verified: true,
+    responseTime: "1 hour",
+    availability: "Available now",
+    category: "developers"
+  },
+  {
+    id: 2,
+    name: "Priya Sharma",
+    title: "Senior UI/UX Designer",
+    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b4d0?w=100&h=100&fit=crop&crop=face",
+    location: "Bangalore, India",
+    hourlyRate: "$38/hr",
+    rating: 4.8,
+    totalReviews: 89,
+    skills: ["Figma", "Adobe XD", "Prototyping", "User Research"],
+    bio: "Creating beautiful and intuitive user experiences for SaaS products. 6+ years in design thinking and user-centered design.",
+    verified: true,
+    responseTime: "2 hours",
+    availability: "Available now",
+    category: "designers"
+  },
+  {
+    id: 3,
+    name: "Amit Patel",
+    title: "DevOps Engineer",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+    location: "Pune, India",
+    hourlyRate: "$42/hr",
+    rating: 4.9,
+    totalReviews: 95,
+    skills: ["Docker", "Kubernetes", "AWS", "CI/CD"],
+    bio: "Infrastructure automation specialist with 7+ years in cloud technologies. Helped scale startups to handle millions of users.",
+    verified: true,
+    responseTime: "30 minutes",
+    availability: "Available now",
+    category: "developers"
+  },
+  {
+    id: 4,
+    name: "Sneha Reddy",
+    title: "Digital Marketing Specialist",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+    location: "Hyderabad, India",
+    hourlyRate: "$25/hr",
+    rating: 4.7,
+    totalReviews: 156,
+    skills: ["Google Ads", "SEO", "Content Marketing", "Analytics"],
+    bio: "Growth-focused marketer with proven track record of increasing online visibility and conversions for B2B and B2C companies.",
+    verified: true,
+    responseTime: "1 hour",
+    availability: "Available now",
+    category: "marketing"
+  },
+  {
+    id: 5,
+    name: "Vikram Singh",
+    title: "Data Scientist",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+    location: "Delhi, India",
+    hourlyRate: "$50/hr",
+    rating: 4.8,
+    totalReviews: 73,
+    skills: ["Python", "Machine Learning", "TensorFlow", "SQL"],
+    bio: "AI/ML expert with 5+ years in predictive analytics and deep learning. Worked with Fortune 500 companies on data-driven solutions.",
+    verified: true,
+    responseTime: "2 hours",
+    availability: "Available now",
+    category: "developers"
+  },
+  {
+    id: 6,
+    name: "Kavya Nair",
+    title: "Project Manager",
+    avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face",
+    location: "Kochi, India",
+    hourlyRate: "$35/hr",
+    rating: 4.9,
+    totalReviews: 112,
+    skills: ["Scrum", "Agile", "Jira", "Stakeholder Management"],
+    bio: "Certified PMP with 8+ years managing complex software projects. Expert in Agile methodologies and cross-functional team leadership.",
+    verified: true,
+    responseTime: "1 hour",
+    availability: "Available now",
+    category: "project-managers"
+  }
+];
 
-  const { data: featuredJobs = [] } = useQuery({
-    queryKey: ['/api/jobs'],
-  });
+const talentCategories = [
+  {
+    id: 1,
+    name: "Software Developers",
+    slug: "developers",
+    description: "Full-stack developers, frontend specialists, backend engineers",
+    icon: "💻",
+    color: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800",
+    totalTalents: 2847,
+    averageRate: "$45"
+  },
+  {
+    id: 2,
+    name: "Designers",
+    slug: "designers",
+    description: "UI/UX designers, graphic designers, product designers",
+    icon: "🎨",
+    color: "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800",
+    totalTalents: 1523,
+    averageRate: "$38"
+  },
+  {
+    id: 3,
+    name: "Marketing Experts",
+    slug: "marketing",
+    description: "Digital marketers, content strategists, SEO specialists",
+    icon: "📈",
+    color: "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800",
+    totalTalents: 892,
+    averageRate: "$32"
+  },
+  {
+    id: 4,
+    name: "Project Managers",
+    slug: "project-managers",
+    description: "Scrum masters, product managers, technical leads",
+    icon: "📋",
+    color: "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800",
+    totalTalents: 645,
+    averageRate: "$42"
+  }
+];
 
+function ProfileCard({ profile }) {
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-block animate-float mb-6">
-              <div className="w-20 h-20 bg-gradient-to-r from-primary via-purple-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i className="fas fa-globe-asia text-white text-2xl"></i>
+    <Card className="hover:shadow-lg transition-shadow duration-200 border border-slate-200 dark:border-slate-700">
+      <CardContent className="p-6">
+        <div className="flex items-start space-x-4">
+          <div className="relative">
+            <Avatar className="w-16 h-16">
+              <AvatarImage src={profile.avatar} alt={profile.name} />
+              <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                {profile.name.split(' ').map(n => n[0]).join('')}
+              </AvatarFallback>
+            </Avatar>
+            {profile.verified && (
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                <i className="fas fa-check text-white text-xs"></i>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 truncate">
+                  {profile.name}
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">
+                  {profile.title}
+                </p>
+                <div className="flex items-center space-x-4 text-sm text-slate-500 dark:text-slate-400 mb-3">
+                  <span className="flex items-center space-x-1">
+                    <i className="fas fa-map-marker-alt text-xs"></i>
+                    <span>{profile.location}</span>
+                  </span>
+                  <span className="flex items-center space-x-1">
+                    <i className="fas fa-star text-yellow-400 text-xs"></i>
+                    <span>{profile.rating} ({profile.totalReviews})</span>
+                  </span>
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                  {profile.hourlyRate}
+                </div>
+                <div className="text-xs text-green-600 dark:text-green-400">
+                  {profile.availability}
+                </div>
               </div>
             </div>
             
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6">
-              <span className="bg-gradient-to-r from-slate-900 via-primary to-purple-600 dark:from-slate-100 dark:via-primary dark:to-purple-400 bg-clip-text text-transparent">
-                Remote Tech Jobs
-              </span>
-              <br />
-              <span className="text-slate-700 dark:text-slate-300">Made for India</span>
-            </h1>
-            
-            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-8 leading-relaxed">
-              Discover amazing remote opportunities across 30+ tech specializations. From AI/ML to Cloud Computing, 
-              find your dream job with global companies while staying in India.
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-2">
+              {profile.bio}
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-              <Link href="/jobs">
-                <Button className="px-8 py-4 bg-gradient-to-r from-primary to-purple-600 text-white rounded-full font-semibold text-lg hover:from-primary/90 hover:to-purple-600/90 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                  <i className="fas fa-search mr-2"></i>
-                  Find Jobs Now
-                </Button>
-              </Link>
-              <Button variant="outline" className="px-8 py-4 border-2 border-primary text-primary rounded-full font-semibold text-lg hover:bg-primary/10 transition-all duration-300">
-                <i className="fas fa-play mr-2"></i>
-                Watch Demo
-              </Button>
+            <div className="flex flex-wrap gap-1 mb-3">
+              {profile.skills.slice(0, 4).map((skill) => (
+                <Badge key={skill} variant="secondary" className="text-xs">
+                  {skill}
+                </Badge>
+              ))}
+              {profile.skills.length > 4 && (
+                <Badge variant="outline" className="text-xs">
+                  +{profile.skills.length - 4}
+                </Badge>
+              )}
             </div>
             
-            {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">15,000+</div>
-                <div className="text-slate-600 dark:text-slate-400">Active Jobs</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-2">800+</div>
-                <div className="text-slate-600 dark:text-slate-400">Partner Companies</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-cyan-600 dark:text-cyan-400 mb-2">97%</div>
-                <div className="text-slate-600 dark:text-slate-400">Success Rate</div>
-              </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-500 dark:text-slate-400">
+                Responds in {profile.responseTime}
+              </span>
+              <Link href={`/talents/${profile.category}`}>
+                <Button size="sm" variant="outline">
+                  View Profile
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function CategoryCard({ category }) {
+  return (
+    <Link href={`/talents/${category.slug}`}>
+      <Card className={`hover:shadow-lg transition-all duration-200 cursor-pointer border ${category.color}`}>
+        <CardContent className="p-6 text-center">
+          <div className="text-4xl mb-4">{category.icon}</div>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+            {category.name}
+          </h3>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            {category.description}
+          </p>
+          <div className="flex justify-between items-center text-sm">
+            <span className="text-slate-500 dark:text-slate-400">
+              {category.totalTalents.toLocaleString()} talents
+            </span>
+            <span className="font-semibold text-slate-900 dark:text-slate-100">
+              From {category.averageRate}/hr
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
+export default function Home() {
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  
+  const filteredProfiles = selectedCategory === "all" 
+    ? sampleProfiles 
+    : sampleProfiles.filter(profile => profile.category === selectedCategory);
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      {/* Hero Section */}
+      <section className="pt-20 pb-16 px-4">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-6">
+            Hire the top 3% of
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+              Indian talent
+            </span>
+          </h1>
+          
+          <p className="text-xl text-slate-600 dark:text-slate-400 mb-8 max-w-3xl mx-auto">
+            TopSkyll is an exclusive network of the top remote talent from India. 
+            Hire skilled professionals who have been rigorously screened and are ready to contribute immediately.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <Link href="/hire">
+              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <i className="fas fa-search mr-2"></i>
+                Hire Talent
+              </Button>
+            </Link>
+            
+            <Link href="/apply">
+              <Button size="lg" variant="outline">
+                <i className="fas fa-user-plus mr-2"></i>
+                Join as Talent
+              </Button>
+            </Link>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-8 text-sm text-slate-600 dark:text-slate-400">
+            <div className="flex items-center space-x-2">
+              <i className="fas fa-shield-alt text-green-600"></i>
+              <span>Pre-vetted talent</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <i className="fas fa-clock text-blue-600"></i>
+              <span>Hire in 48 hours</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <i className="fas fa-globe text-purple-600"></i>
+              <span>Time zone aligned</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <i className="fas fa-handshake text-orange-600"></i>
+              <span>Risk-free trial</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Job Categories Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
+      {/* Talent Categories */}
+      <section className="py-16 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-              Explore Tech Specializations
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+              Browse talent by category
             </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Browse opportunities across cutting-edge technologies and find your perfect match
+            <p className="text-lg text-slate-600 dark:text-slate-400">
+              Find the perfect professional for your project needs
             </p>
           </div>
           
-          {/* Categories Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.slice(0, 12).map((category) => (
-              <CategoryCard 
-                key={category.id} 
-                category={category} 
-                jobCount={Math.floor(Math.random() * 1000) + 100} 
-              />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {talentCategories.map((category) => (
+              <CategoryCard key={category.id} category={category} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Talent Profiles */}
+      <section className="py-16 px-4 bg-white dark:bg-slate-800">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+              Meet our top talent
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">
+              Experienced professionals ready to join your team
+            </p>
+            
+            {/* Category Filter */}
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              <Button
+                variant={selectedCategory === "all" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedCategory("all")}
+              >
+                All Talents
+              </Button>
+              {talentCategories.map((category) => (
+                <Button
+                  key={category.slug}
+                  variant={selectedCategory === category.slug ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSelectedCategory(category.slug)}
+                >
+                  {category.name}
+                </Button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredProfiles.map((profile) => (
+              <ProfileCard key={profile.id} profile={profile} />
             ))}
           </div>
           
           <div className="text-center mt-12">
-            <Link href="/jobs">
-              <Button variant="outline" className="px-8 py-3 border-2 border-primary text-primary rounded-full font-semibold hover:bg-primary/10 transition-all duration-300">
-                View All Categories
+            <Link href="/talents/developers">
+              <Button size="lg" variant="outline">
+                View All Talent Profiles
+                <i className="fas fa-arrow-right ml-2"></i>
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Featured Jobs Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50 dark:bg-slate-800/50">
+      {/* Stats Section */}
+      <section className="py-16 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <h2 className="text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-                Featured Remote Jobs
-              </h2>
-              <p className="text-xl text-slate-600 dark:text-slate-400">
-                Hand-picked opportunities from top companies
-              </p>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                5,000+
+              </div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">
+                Vetted Talents
+              </div>
             </div>
-            <Link href="/jobs">
-              <Button className="px-6 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/90 transition-colors">
-                View All Jobs
-              </Button>
-            </Link>
-          </div>
-          
-          {/* Job Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {featuredJobs.slice(0, 4).map((job) => (
-              <JobCard key={job.id} job={job} />
-            ))}
+            <div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                98%
+              </div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">
+                Success Rate
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                48hr
+              </div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">
+                Avg. Hire Time
+              </div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">
+                4.9/5
+              </div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">
+                Client Rating
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary via-purple-600 to-pink-600 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            Ready to Land Your Dream Remote Job?
+      <section className="py-16 px-4 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="max-w-4xl mx-auto text-center text-white">
+          <h2 className="text-3xl font-bold mb-4">
+            Ready to hire top talent?
           </h2>
-          <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-            Join thousands of professionals who've found amazing remote opportunities through Topskyll. 
-            Create your profile and start applying today.
+          <p className="text-xl mb-8 opacity-90">
+            Get matched with pre-vetted professionals in just 48 hours
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/signup">
-              <Button className="px-8 py-4 bg-white text-primary rounded-full font-semibold text-lg hover:bg-slate-100 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                <i className="fas fa-user-plus mr-2"></i>
-                Create Free Profile
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/hire">
+              <Button size="lg" variant="secondary">
+                <i className="fas fa-rocket mr-2"></i>
+                Start Hiring Now
               </Button>
             </Link>
-            <Link href="/jobs">
-              <Button variant="outline" className="px-8 py-4 border-2 border-white text-white rounded-full font-semibold text-lg hover:bg-white hover:text-primary transition-all duration-300">
-                <i className="fas fa-briefcase mr-2"></i>
-                Browse All Jobs
+            <Link href="/how-it-works">
+              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-slate-900">
+                <i className="fas fa-play mr-2"></i>
+                How It Works
               </Button>
             </Link>
           </div>
         </div>
-        
-        {/* Floating elements */}
-        <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-float"></div>
-        <div className="absolute top-20 right-20 w-16 h-16 bg-white/10 rounded-full animate-float" style={{animationDelay: '-2s'}}></div>
-        <div className="absolute bottom-10 left-1/4 w-12 h-12 bg-white/10 rounded-full animate-float" style={{animationDelay: '-4s'}}></div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-300 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-            {/* Brand Section */}
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-2 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-r from-primary to-purple-600 rounded-xl flex items-center justify-center">
-                  <i className="fas fa-rocket text-white text-lg"></i>
-                </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
-                  Topskyll
-                </span>
-              </div>
-              <p className="text-slate-400 mb-6 max-w-md">
-                Connecting talented professionals in India with amazing remote opportunities worldwide. 
-                Your gateway to global tech careers.
-              </p>
-              <div className="flex space-x-4">
-                <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
-                  <i className="fab fa-twitter"></i>
-                </a>
-                <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
-                  <i className="fab fa-linkedin"></i>
-                </a>
-                <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
-                  <i className="fab fa-instagram"></i>
-                </a>
-                <a href="#" className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-primary transition-colors">
-                  <i className="fab fa-github"></i>
-                </a>
-              </div>
-            </div>
-            
-            {/* Quick Links */}
-            <div>
-              <h4 className="text-white font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2">
-                <li><Link href="/jobs" className="hover:text-primary transition-colors">Browse Jobs</Link></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Companies</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Job Categories</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Salary Guide</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Career Resources</a></li>
-              </ul>
-            </div>
-            
-            {/* Support */}
-            <div>
-              <h4 className="text-white font-semibold mb-4">Support</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="hover:text-primary transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Cookie Policy</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between">
-            <p className="text-slate-400 mb-4 md:mb-0">
-              © 2024 Topskyll. All rights reserved. Made with ❤️ in India
-            </p>
-            <div className="flex items-center space-x-6 text-sm">
-              <span className="text-slate-400">🇮🇳 Remote Jobs for India</span>
-              <span className="text-slate-400">🌐 Global Opportunities</span>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
